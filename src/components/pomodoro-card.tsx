@@ -7,6 +7,8 @@ import { ComponentProps, useState } from "react";
 import { FastForward, PauseIcon, PlayIcon, RotateCcwIcon, SettingsIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Separator } from "./ui/separator";
 
 function ButtonWithTooltip({
   children,
@@ -78,9 +80,22 @@ export default function PomodoroCard() {
       <CardHeader className="px-0 pb-10 pt-0">
         <div className="flex items-baseline justify-between">
           <CardTitle className="text-3xl ">Pomodoro</CardTitle>
-          <ButtonWithTooltip tooltip="Pomodoro Settings" variant="ghost" className="group py-6">
-            <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
-          </ButtonWithTooltip>
+          <Dialog>
+            <DialogTrigger asChild>
+              <ButtonWithTooltip tooltip="Pomodoro Settings" variant="ghost" className="group py-6">
+                <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
+              </ButtonWithTooltip>
+            </DialogTrigger>
+            <DialogContent className="top-[25%]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">Pomodoro Settings</DialogTitle>
+              </DialogHeader>
+              <Separator />
+              <div>
+                <p>Coming Soon</p>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <Tabs value={activeTabId} onValueChange={handleTabChange}>
