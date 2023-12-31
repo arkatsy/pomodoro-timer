@@ -12,7 +12,6 @@ function ButtonWithTooltip({
   children,
   tooltip,
   className,
-  variant = "outline",
   ...props
 }: {
   children: React.ReactNode;
@@ -23,7 +22,7 @@ function ButtonWithTooltip({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button className={className} variant={variant} {...props}>
+          <Button className={className} {...props}>
             {children}
           </Button>
         </TooltipTrigger>
@@ -40,21 +39,14 @@ export default function PomodoroCard() {
   const getTabSession = (tabId: TimerId = tabs.find((tab) => tab.isActive)!.id) =>
     tabs.find((tab) => tab.id === tabId)!.time;
 
-  const {
-    time,
-    begin,
-    status,
-    pause,
-    resume,
-    reset: handleResetButtonClick,
-    setSession,
-  } = useCountdown(getTabSession);
+  const { time, begin, status, pause, resume, reset: handleResetButtonClick, setSession } = useCountdown(getTabSession);
 
   const handleTabChange = (value: string) => {
     const tabId = value as TimerId;
     setTabs((tabs) => tabs.map((tab) => ({ ...tab, isActive: tab.id === tabId })));
     setSession(getTabSession(tabId));
   };
+
   const moveToNextTab = () => {
     const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
     const nextTabIndex = (activeTabIndex + 1) % tabs.length;
@@ -63,20 +55,26 @@ export default function PomodoroCard() {
 
   const handlePlaybackButtonClick = () => (isIdle ? begin() : isRunning ? pause() : resume());
 
+  const activeTabId = tabs.find((tab) => tab.isActive)!.id;
   const isRunning = status === "running";
   const isIdle = status === "idle";
   const isPaused = status === "paused";
-
-  const progress = (time / getTabSession()) * 100;
-  const activeTabId = tabs.find((tab) => tab.isActive)!.id;
-  const tw_iconSizes = "w-6 h-6 text-primary/80 group-hover:text-primary";
-
-  const shouldDisableTabs = !isIdle;
-
   const isBreak = !(activeTabId === "pomodoro");
+  const shouldDisableTabs = !isIdle;
+  const progress = (time / getTabSession()) * 100;
+  const controlButtons = [
+    { id: "reset", Icon: RotateCcwIcon, tooltip: "Reset Timer", onClick: handleResetButtonClick },
+    {
+      id: "playstop",
+      Icon: isIdle || isPaused ? PlayIcon : PauseIcon,
+      tooltip: "Start/Pause Timer",
+      onClick: handlePlaybackButtonClick,
+    },
+    { id: "skip", Icon: FastForward, tooltip: isBreak ? "Skip Break" : "Skip Session", onClick: moveToNextTab },
+  ] as const;
 
   return (
-    <Card className="w-full min-w-fit max-w-lg space-y-0 p-10">
+    <Card id="pomodoro-card" className="w-full min-w-fit max-w-lg space-y-0 p-10">
       <CardHeader className="px-0 pb-10 pt-0">
         <div className="flex items-baseline justify-between">
           <CardTitle className="text-3xl ">Pomodoro</CardTitle>
@@ -113,34 +111,17 @@ export default function PomodoroCard() {
               }`}
             />
             <div className="flex w-full justify-center gap-8">
-              <ButtonWithTooltip
-                className="group py-6"
-                tooltip="Reset timer"
-                onClick={handleResetButtonClick}
-              >
-                <RotateCcwIcon className={tw_iconSizes} />
-              </ButtonWithTooltip>
-              <ButtonWithTooltip
-                variant={isIdle ? "default" : "outline"}
-                className="py-6"
-                tooltip="Start/Pause timer"
-                onClick={handlePlaybackButtonClick}
-              >
-                <span>
-                  {isIdle || isPaused ? (
-                    <PlayIcon className={cn(tw_iconSizes, isIdle && "text-primary-foreground")} />
-                  ) : (
-                    <PauseIcon className={tw_iconSizes} />
-                  )}
-                </span>
-              </ButtonWithTooltip>
-              <ButtonWithTooltip
-                className="py-6"
-                tooltip={isBreak ? "Skip break" : "Skip session"}
-                onClick={moveToNextTab}
-              >
-                <FastForward className={tw_iconSizes} />
-              </ButtonWithTooltip>
+              {controlButtons.map(({ id, Icon, tooltip, onClick }) => (
+                <ButtonWithTooltip
+                  key={id}
+                  className="group py-6"
+                  tooltip={tooltip}
+                  onClick={onClick}
+                  variant={id === "playstop" ? "default" : "outline"}
+                >
+                  <Icon className="h-6 w-6" />
+                </ButtonWithTooltip>
+              ))}
             </div>
           </div>
         </TabsContent>
