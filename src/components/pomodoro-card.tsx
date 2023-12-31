@@ -3,38 +3,35 @@ import { Tabs, TabsList, TabsContent, TabsTrigger } from "@radix-ui/react-tabs";
 import { type TimerId, defaultTimerTabs, formatTime, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import useCountdown from "@/hooks/useCountdown";
-import { ComponentProps, useState } from "react";
+import { type ComponentProps, type ElementRef, forwardRef, useState } from "react";
 import { FastForward, PauseIcon, PlayIcon, RotateCcwIcon, SettingsIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Separator } from "./ui/separator";
 
-function ButtonWithTooltip({
-  children,
-  tooltip,
-  className,
-  ...props
-}: {
-  children: React.ReactNode;
-  className?: string;
+type ButtonWithTooltipProps = ComponentProps<typeof Button> & {
   tooltip: string;
-} & ComponentProps<typeof Button>) {
-  return (
-    <TooltipProvider disableHoverableContent>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button className={className} {...props}>
-            {children}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
+};
+
+const ButtonWithTooltip = forwardRef<ElementRef<typeof DialogTrigger>, ButtonWithTooltipProps>(
+  ({ children, tooltip, ...props }, ref) => {
+    return (
+      <TooltipProvider disableHoverableContent>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button {...props} ref={ref}>
+              {children}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  },
+);
 
 export default function PomodoroCard() {
   const [tabs, setTabs] = useState(defaultTimerTabs);
