@@ -19,7 +19,7 @@ function ButtonWithTooltip({
   tooltip: string;
 } & ComponentProps<typeof Button>) {
   return (
-    <TooltipProvider>
+    <TooltipProvider disableHoverableContent>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button className={className} {...props}>
@@ -119,7 +119,12 @@ export default function PomodoroCard() {
                   onClick={onClick}
                   variant={id === "playstop" ? "default" : "outline"}
                 >
-                  <Icon className="h-6 w-6" />
+                  <Icon
+                    className={cn(
+                      "h-6 w-6 ",
+                      id === "playstop" ? "text-primary-foreground" : "text-primary/80 group-hover:text-primary",
+                    )}
+                  />
                 </ButtonWithTooltip>
               ))}
             </div>
