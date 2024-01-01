@@ -7,6 +7,7 @@ test("should return the correct initial state", () => {
   const { result } = renderHook(() => useCountdown(SESSION));
   expect(result.current.status).toBe<TimerStatus>("idle");
   expect(result.current.time).toBe(SESSION);
+  expect(result.current.session).toBe(SESSION);
 });
 
 test("should return the correct state after calling begin", () => {
@@ -53,7 +54,7 @@ test("should decrement the timer every second by 1", async () => {
   const SESSION = 25;
   const { result } = renderHook(() => useCountdown(SESSION));
   act(() => result.current.begin());
-  Array.from({ length: SESSION }, (_, i) => i + 1).map((i) => {
+  Array.from({ length: SESSION }, (_, i) => i + 1).forEach((i) => {
     act(() => vi.advanceTimersByTime(1000));
     expect(result.current.time).toBe(SESSION - i);
   });
@@ -64,9 +65,58 @@ test("should stop the timer when the time left reaches 0 and return the correct 
   const SESSION = 25;
   const { result } = renderHook(() => useCountdown(SESSION));
   act(() => result.current.begin());
-  Array.from({ length: SESSION }, (_, i) => i + 1).map((i) => {
+  Array.from({ length: SESSION }, (_, i) => i + 1).forEach((i) => {
     act(() => vi.advanceTimersByTime(1000));
     expect(result.current.time).toBe(SESSION - i);
   });
   expect(result.current.status).toBe<TimerStatus>("done");
+});
+
+test("should always return the correct session", async () => {
+  let SESSION = 25;
+  const { result } = renderHook(() => useCountdown(SESSION));
+  expect(result.current.session).toBe(SESSION);
+
+  SESSION = 5;
+  act(() => result.current.setSession(SESSION));
+  expect(result.current.session).toBe(SESSION);
+
+  SESSION = 10;
+  act(() => result.current.setSession(SESSION));
+  act(() => result.current.begin());
+  Array.from({ length: SESSION }, (_, i) => i + 1).forEach((i) => {
+    act(() => vi.advanceTimersByTime(1000));
+    expect(result.current.time).toBe(SESSION - i);
+  });
+
+  expect(result.current.session).toBe(SESSION);
+});
+
+test("should reset the timer when we set a new session", async () => {
+  vi.useFakeTimers();
+  let SESSION = 25;
+  const { result } = renderHook(() => useCountdown(SESSION));
+  act(() => result.current.begin());
+  Array.from({ length: SESSION }, (_, i) => i + 1).forEach((i) => {
+    act(() => vi.advanceTimersByTime(1000));
+    expect(result.current.time).toBe(SESSION - i);
+  });
+  expect(result.current.status).toBe<TimerStatus>("done");
+
+  SESSION = 5;
+  act(() => result.current.setSession(SESSION));
+  expect(result.current.time).toBe(SESSION);
+  expect(result.current.status).toBe<TimerStatus>("idle");
+
+  act(() => result.current.begin());
+  Array.from({ length: SESSION }, (_, i) => i + 1).forEach((i) => {
+    act(() => vi.advanceTimersByTime(1000));
+    expect(result.current.time).toBe(SESSION - i);
+  });
+  expect(result.current.status).toBe<TimerStatus>("done");
+
+  SESSION = 10;
+  act(() => result.current.setSession(SESSION));
+  expect(result.current.time).toBe(SESSION);
+  expect(result.current.status).toBe<TimerStatus>("idle");
 });

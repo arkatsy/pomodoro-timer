@@ -35,18 +35,20 @@ if (import.meta.vitest) {
   });
 }
 
-export type TimerId = "pomodoro" | "short-break" | "long-break";
-export type Timer = { id: TimerId; name: string };
-export type TimerTab = Timer & { time: number; isActive: boolean };
+export type TabId = "pomodoro" | "shortBreak" | "longBreak";
+export type Tab = {
+  id: TabId;
+  name: string;
+};
 
-export const timersList: Timer[] = [
-  { id: "pomodoro", name: "Pomodoro" },
-  { id: "short-break", name: "Short Break" },
-  { id: "long-break", name: "Long Break" },
-];
+export type Tabs = {
+  [key in TabId]: Tab;
+};
 
-export const defaultTimerTabs: TimerTab[] = [
-  { id: "pomodoro", name: "Pomodoro", time: 25 * 60, isActive: true },
-  { id: "short-break", name: "Short Break", time: 5 * 60, isActive: false },
-  { id: "long-break", name: "Long Break", time: 15 * 60, isActive: false },
-];
+export const tabs: Tabs = {
+  pomodoro: { id: "pomodoro", name: "Pomodoro" },
+  shortBreak: { id: "shortBreak", name: "Short Break" },
+  longBreak: { id: "longBreak", name: "Long Break" },
+};
+
+export const helper_tabsList = ["pomodoro", "shortBreak", "longBreak"] as const;

@@ -86,6 +86,7 @@ export default function useCountdown(session: number | (() => number)) {
     pause: pauseCountdown,
     resume: resumeCountdown,
     reset: resetCountdown,
+    session: state.session,
     setSession,
   };
 }
