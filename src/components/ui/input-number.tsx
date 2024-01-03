@@ -5,6 +5,7 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface InputNumberProp extends React.InputHTMLAttributes<HTMLInputElement> {
+  onValueChange?: (value: number) => void;
   className?: string;
   min?: number;
   max?: number;
@@ -14,7 +15,7 @@ export interface InputNumberProp extends React.InputHTMLAttributes<HTMLInputElem
 
 // Works only with positive integers
 const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
-  ({ className, min = 0, max = Infinity, step = 1, defaultValue, ...props }, ref) => {
+  ({ className, min = 0, max = Infinity, step = 1, defaultValue, onValueChange, ...props }, ref) => {
     const [value, setValue] = React.useState(defaultValue || 0);
 
     const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +52,10 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
         onMinusClick();
       }
     };
+
+    React.useEffect(() => {
+      if (onValueChange) onValueChange(value);
+    }, [value]);
 
     return (
       <div className="relative flex w-full max-w-[185px] items-center">
@@ -92,6 +97,6 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
   },
 );
 
-InputNumber.displayName = "Input Number";
+InputNumber.displayName = "InputNumber";
 
 export default InputNumber;

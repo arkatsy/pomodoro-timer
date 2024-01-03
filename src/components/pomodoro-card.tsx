@@ -10,19 +10,16 @@ import {
   Play as PlayIcon,
   RotateCcw as RotateCcwIcon,
   Settings as SettingsIcon,
-  Minus as MinusIcon,
-  Plus as PlusIcon,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Separator } from "./ui/separator";
-import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { produce } from "immer";
 import useTabTimers from "@/hooks/useTabTimers";
+import InputNumber from "./ui/input-number";
 
-// TODO: Add tests
 export default function PomodoroCard() {
   const {
     activeTab,
@@ -60,8 +57,6 @@ export default function PomodoroCard() {
     },
     { id: "skip", Icon: FastForwardIcon, tooltip: isBreak ? "Skip Break" : "Skip Session", onClick: nextTab },
   ] as const;
-
-  // TODO: Pause timer when settings dialog is open
 
   return (
     <Card id="pomodoro-card" className="w-full min-w-fit max-w-lg space-y-0 p-10">
@@ -142,93 +137,90 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
     },
   });
 
-  // TODO: Separate InputNumber to its own component with its own state
-  // TODO: InputNumber is not responsive for very small screens
-
-  const onInputMinsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.currentTarget;
-    const newValue = Number(value);
-    if (newValue < 0 || isNaN(newValue)) {
-      return;
-    }
-    if (newValue > 999) {
-      setSettings(
-        produce((draft: typeof settings) => {
-          draft.pomodoro.mins = 999;
-        }),
-      );
-    } else {
-      setSettings(
-        produce((draft: typeof settings) => {
-          draft.pomodoro.mins = newValue;
-        }),
-      );
-    }
-  };
-
-  const onInputSecsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.currentTarget;
-    const newValue = Number(value);
-    if (newValue < 0 || isNaN(newValue)) {
-      return;
-    }
-    if (newValue > 59) {
-      setSettings(
-        produce((draft: typeof settings) => {
-          draft.pomodoro.secs = 59;
-        }),
-      );
-    } else {
-      setSettings(
-        produce((draft: typeof settings) => {
-          draft.pomodoro.secs = newValue;
-        }),
-      );
-    }
-  };
-
-  const onInputMinsPlus = () =>
-    setSettings(
-      produce((draft: typeof settings) => {
-        if (!(draft.pomodoro.mins < 0 || draft.pomodoro.mins > 998)) draft.pomodoro.mins += 1;
-      }),
-    );
-
-  const onInputMinsMinus = () =>
-    setSettings(
-      produce((draft: typeof settings) => {
-        if (draft.pomodoro.mins > 0) draft.pomodoro.mins -= 1;
-      }),
-    );
-
-  const onInputSecsPlus = () =>
-    setSettings(
-      produce((draft: typeof settings) => {
-        if (!(draft.pomodoro.secs < 0 && draft.pomodoro.secs.toString().length <= 2) && draft.pomodoro.secs < 59)
-          draft.pomodoro.secs += 1;
-      }),
-    );
-
-  const onInputSecsMinus = () =>
-    setSettings(
-      produce((draft: typeof settings) => {
-        if (draft.pomodoro.secs > 0 && draft.pomodoro.secs.toString().length <= 2) draft.pomodoro.secs -= 1;
-      }),
-    );
-
   const handleSettingsDone = () => {
     const newPomodoroTime = settings.pomodoro.mins * 60 + settings.pomodoro.secs;
+    const newShortBreakSession = settings.shortBreak.mins * 60 + settings.shortBreak.secs;
+    const newLongBreakSession = settings.longBreak.mins * 60 + settings.longBreak.secs;
 
     applySettings({
       pomodoro: newPomodoroTime,
-
-      // TODO: Implement long break
-      shortBreak: shortBreakSession,
-
-      // TODO: Implement long break
-      longBreak: longBreakSession,
+      shortBreak: newShortBreakSession,
+      longBreak: newLongBreakSession,
     });
   };
+
+  const handlePomodoroMinsChange = (mins: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.pomodoro.mins = mins;
+      }),
+    );
+  };
+
+  const handlePomodoroSecsChange = (secs: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.pomodoro.secs = secs;
+      }),
+    );
+  };
+
+  const handleShortBreakMinsChange = (mins: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.shortBreak.mins = mins;
+      }),
+    );
+  };
+
+  const handleShortBreakSecsChange = (secs: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.shortBreak.secs = secs;
+      }),
+    );
+  };
+
+  const handleLongBreakMinsChange = (mins: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.longBreak.mins = mins;
+      }),
+    );
+  };
+
+  const handleLongBreakSecsChange = (secs: number) => {
+    setSettings(
+      produce((draft) => {
+        draft.longBreak.secs = secs;
+      }),
+    );
+  };
+
+  const inputGroups = [
+    {
+      label: "Session",
+      mins: settings.pomodoro.mins,
+      secs: settings.pomodoro.secs,
+      onMinsChange: handlePomodoroMinsChange,
+      onSecsChange: handlePomodoroSecsChange,
+    },
+    {
+      label: "Short Break",
+      mins: settings.shortBreak.mins,
+      secs: settings.shortBreak.secs,
+      onMinsChange: handleShortBreakMinsChange,
+      onSecsChange: handleShortBreakSecsChange,
+    },
+    {
+      label: "Long Break",
+      mins: settings.longBreak.mins,
+      secs: settings.longBreak.secs,
+      onMinsChange: handleLongBreakMinsChange,
+      onSecsChange: handleLongBreakSecsChange,
+    },
+  ];
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -236,40 +228,30 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
           <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
         </ButtonWithTooltip>
       </DialogTrigger>
-      <DialogContent className="top-[25%]">
+      <DialogContent className="top-[40%]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Pomodoro Settings</DialogTitle>
         </DialogHeader>
         <Separator />
         <div className="flex flex-col py-2">
-          <ul>
-            <li className="flex flex-col gap-4">
-              <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor="session">
-                <ClockIcon className="size-5" />
-                <span>Session</span>
-              </Label>
-              <div className="flex items-center">
-                <InputNumber
-                  id="session-mins"
-                  value={settings.pomodoro.mins}
-                  onInput={onInputMinsChange}
-                  onPlusClick={onInputMinsPlus}
-                  onMinusClick={onInputMinsMinus}
-                />
-                <Separator className="-ml-2 w-4" />
-                <InputNumber
-                  id="session-secs"
-                  value={settings.pomodoro.secs}
-                  onInput={onInputSecsChange}
-                  onPlusClick={onInputSecsPlus}
-                  onMinusClick={onInputSecsMinus}
-                />
-              </div>
-              <div className="flex gap-2 text-sm">
-                <span>Time Preview:</span>
-                <span>{formatTime(settings.pomodoro.mins * 60 + settings.pomodoro.secs)}</span>
-              </div>
-            </li>
+          <ul className="flex flex-col gap-12">
+            {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange }) => (
+              <li key={label} className="flex flex-col gap-4">
+                <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor="session">
+                  <ClockIcon className="size-5" />
+                  <span>{label}</span>
+                </Label>
+                <div className="flex items-center">
+                  <InputNumber min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
+                  <Separator className="-ml-2 w-4" />
+                  <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
+                </div>
+                <div className="flex gap-2 text-sm">
+                  <span>Time Preview:</span>
+                  <span>{formatTime(mins * 60 + secs)}</span>
+                </div>
+              </li>
+            ))}
           </ul>
           <DialogClose asChild>
             <Button className="w-min self-end" onClick={handleSettingsDone}>
@@ -279,33 +261,6 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function InputNumber({
-  onInput,
-  onPlusClick,
-  onMinusClick,
-  className,
-  ...props
-}: {
-  onInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onPlusClick: () => void;
-  onMinusClick: () => void;
-  className?: string;
-} & ComponentProps<typeof Input>) {
-  return (
-    <div className="relative flex w-full max-w-[185px] items-center">
-      <Input inputMode="numeric" className={cn("mr-2", className)} onInput={onInput} {...props} />
-      <div className="absolute right-2 top-0">
-        <Button variant="outline" type="button" className="rounded-none" onClick={onPlusClick}>
-          <PlusIcon className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" type="button" className="rounded-l-none border-l-0" onClick={onMinusClick}>
-          <MinusIcon className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
   );
 }
 
