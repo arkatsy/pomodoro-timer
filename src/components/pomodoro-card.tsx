@@ -46,7 +46,7 @@ export default function PomodoroCard() {
   const isIdle = activeTimer.status === "idle";
   const isPaused = activeTimer.status === "paused";
   const isBreak = !(+activeTab === 0);
-  const shouldDisableTabs = !isIdle;
+  const shouldDisableTabs = isRunning;
   const progress = (activeTimer.time / activeTimer.session) * 100;
   const controlButtons = [
     { id: "reset", Icon: RotateCcwIcon, tooltip: "Reset Timer", onClick: activeTimer.reset },
