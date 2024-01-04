@@ -1,4 +1,4 @@
-import { type ComponentProps, type ElementRef, forwardRef, useState } from "react";
+import { type ComponentProps, type ElementRef, forwardRef, useState, Fragment } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { formatTime, cn, tabs, helper_tabsList, TabId } from "@/lib/utils";
@@ -19,6 +19,7 @@ import { Label } from "./ui/label";
 import { produce } from "immer";
 import useTabTimers from "@/hooks/useTabTimers";
 import InputNumber from "./ui/input-number";
+import { LayoutGroup, motion } from "framer-motion";
 
 export default function PomodoroCard() {
   const {
@@ -72,13 +73,32 @@ export default function PomodoroCard() {
         </div>
       </CardHeader>
       <Tabs value={activeTab.id} onValueChange={(value) => changeActiveTab(value as TabId)}>
-        <TabsList className="grid h-14 w-full grid-cols-3 p-1.5">
-          {helper_tabsList.map((tabId) => (
-            <TabsTrigger key={tabId} value={tabId} className="h-full text-lg" disabled={shouldDisableTabs}>
-              {tabs[tabId].name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <LayoutGroup>
+          <TabsList className="grid h-14 grid-cols-3 p-1">
+            {helper_tabsList.map((tabId) => (
+              <div key={tabId} className="relative z-0 h-full">
+                <TabsTrigger
+                  value={tabId}
+                  className="peer relative z-20 h-full w-full text-lg data-[state=active]:bg-transparent"
+                  disabled={shouldDisableTabs}
+                >
+                  {tabs[tabId].name}
+                </TabsTrigger>
+                {activeTab.id === tabId && (
+                  <motion.div
+                    className="absolute inset-0 z-10 rounded-md peer-data-[state=active]:bg-background peer-data-[state=active]:text-foreground peer-data-[state=active]:shadow-sm"
+                    layoutId="timer-tab"
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 30,
+                    }}
+                  ></motion.div>
+                )}
+              </div>
+            ))}
+          </TabsList>
+        </LayoutGroup>
         <TabsContent value={activeTab.id} tabIndex={-1} className="mt-16 flex flex-col items-center justify-center">
           <span className="text-[7rem] font-semibold">{formatTime(activeTimer.time)}</span>
           <div className="flex w-full flex-col gap-16">
@@ -228,7 +248,7 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
           <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
         </ButtonWithTooltip>
       </DialogTrigger>
-      <DialogContent className="top-[40%]">
+      <DialogContent className="top-1/2">
         <DialogHeader>
           <DialogTitle className="text-2xl">Pomodoro Settings</DialogTitle>
         </DialogHeader>
@@ -271,7 +291,7 @@ type ButtonWithTooltipProps = ComponentProps<typeof Button> & {
 const ButtonWithTooltip = forwardRef<ElementRef<typeof DialogTrigger>, ButtonWithTooltipProps>(
   ({ children, tooltip, ...props }, ref) => {
     return (
-      <TooltipProvider disableHoverableContent>
+      <TooltipProvider disableHoverableContent delayDuration={650}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button {...props} ref={ref}>
