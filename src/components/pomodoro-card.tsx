@@ -265,12 +265,12 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
           <ul className="flex flex-col gap-12">
             {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange, Icon }) => (
               <li key={label} className="flex flex-col gap-4">
-                <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor="session">
+                <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor={label}>
                   <Icon className="size-5" />
                   <span>{label}</span>
                 </Label>
                 <div className="flex items-center">
-                  <InputNumber min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
+                  <InputNumber id={label} min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
                   <Separator className="-ml-2 w-4" />
                   <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
                 </div>
