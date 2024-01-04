@@ -60,7 +60,7 @@ export default function PomodoroCard() {
   ] as const;
 
   return (
-    <Card id="pomodoro-card" className="w-full min-w-fit max-w-lg space-y-0 p-10">
+    <Card id="pomodoro-card" className="w-full min-w-[350px] max-w-lg space-y-0 p-10">
       <CardHeader className="px-0 pb-10 pt-0">
         <div className="flex items-baseline justify-between">
           <CardTitle className="text-3xl ">Pomodoro</CardTitle>
@@ -74,12 +74,12 @@ export default function PomodoroCard() {
       </CardHeader>
       <Tabs value={activeTab.id} onValueChange={(value) => changeActiveTab(value as TabId)}>
         <LayoutGroup>
-          <TabsList className="grid h-14 grid-cols-3 p-1">
+          <TabsList className="grid h-14 grid-cols-3">
             {helper_tabsList.map((tabId) => (
               <div key={tabId} className="relative z-0 h-full">
                 <TabsTrigger
                   value={tabId}
-                  className="peer relative z-20 h-full w-full text-lg data-[state=active]:bg-transparent"
+                  className="peer relative z-20 h-full w-full px-0 text-sm data-[state=active]:bg-transparent min-[400px]:text-base"
                   disabled={shouldDisableTabs}
                 >
                   {tabs[tabId].name}
@@ -99,8 +99,12 @@ export default function PomodoroCard() {
             ))}
           </TabsList>
         </LayoutGroup>
-        <TabsContent value={activeTab.id} tabIndex={-1} className="mt-16 flex flex-col items-center justify-center">
-          <span className="text-[7rem] font-semibold">{formatTime(activeTimer.time)}</span>
+        <TabsContent
+          value={activeTab.id}
+          tabIndex={-1}
+          className="mt-16 flex flex-col items-center justify-center gap-8 min-[400px]:gap-4"
+        >
+          <span className="text-8xl font-semibold min-[400px]:text-[7rem]">{formatTime(activeTimer.time)}</span>
           <div className="flex w-full flex-col gap-16">
             <Progress
               value={progress}
