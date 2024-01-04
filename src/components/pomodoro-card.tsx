@@ -10,6 +10,7 @@ import {
   Play as PlayIcon,
   RotateCcw as RotateCcwIcon,
   Settings as SettingsIcon,
+  Hourglass as HourglassIcon,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -223,6 +224,7 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
 
   const inputGroups = [
     {
+      Icon: ClockIcon,
       label: "Session",
       mins: settings.pomodoro.mins,
       secs: settings.pomodoro.secs,
@@ -230,6 +232,7 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
       onSecsChange: handlePomodoroSecsChange,
     },
     {
+      Icon: HourglassIcon,
       label: "Short Break",
       mins: settings.shortBreak.mins,
       secs: settings.shortBreak.secs,
@@ -237,6 +240,7 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
       onSecsChange: handleShortBreakSecsChange,
     },
     {
+      Icon: HourglassIcon,
       label: "Long Break",
       mins: settings.longBreak.mins,
       secs: settings.longBreak.secs,
@@ -259,10 +263,10 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
         <Separator />
         <div className="flex flex-col py-2">
           <ul className="flex flex-col gap-12">
-            {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange }) => (
+            {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange, Icon }) => (
               <li key={label} className="flex flex-col gap-4">
                 <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor="session">
-                  <ClockIcon className="size-5" />
+                  <Icon className="size-5" />
                   <span>{label}</span>
                 </Label>
                 <div className="flex items-center">
