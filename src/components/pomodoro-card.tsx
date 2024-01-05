@@ -21,6 +21,7 @@ import { produce } from "immer";
 import useTabTimers from "@/hooks/useTabTimers";
 import InputNumber from "./ui/input-number";
 import { LayoutGroup, motion } from "framer-motion";
+import { defaultTimers } from "@/lib/utils";
 
 export default function PomodoroCard() {
   const {
@@ -31,7 +32,7 @@ export default function PomodoroCard() {
     longBreakCountdown,
     pomodoroCountdown,
     shortBreakCountdown,
-  } = useTabTimers(25 * 60, 5 * 60, 15 * 60);
+  } = useTabTimers(defaultTimers.pomodoro, defaultTimers.shortBreak, defaultTimers.longBreak);
 
   const activeTimer =
     activeTab.id === "pomodoro"
@@ -52,7 +53,7 @@ export default function PomodoroCard() {
   const controlButtons = [
     { id: "reset", Icon: RotateCcwIcon, tooltip: "Reset Timer", onClick: activeTimer.reset },
     {
-      id: "playstop",
+      id: "playback",
       Icon: isIdle || isPaused ? PlayIcon : PauseIcon,
       tooltip: "Start/Pause Timer",
       onClick: handlePlaybackButtonClick,
@@ -79,6 +80,7 @@ export default function PomodoroCard() {
             {helper_tabsList.map((tabId) => (
               <div key={tabId} className="relative z-0 h-full">
                 <TabsTrigger
+                  aria-label={tabs[tabId].name}
                   value={tabId}
                   className="peer relative z-20 h-full w-full px-0 text-sm data-[state=active]:bg-transparent min-[400px]:text-base"
                   disabled={shouldDisableTabs}
@@ -105,7 +107,14 @@ export default function PomodoroCard() {
           tabIndex={-1}
           className="mt-16 flex flex-col items-center justify-center gap-8 min-[400px]:gap-4"
         >
-          <span className="text-8xl font-semibold min-[400px]:text-[7rem]">{formatTime(activeTimer.time)}</span>
+          <span
+            role="timer"
+            aria-label={+activeTab === 1 ? "Short break time" : +activeTab === 2 ? "Long break time" : "Pomodoro time"}
+            aria-pressed={isRunning}
+            className="text-8xl font-semibold min-[400px]:text-[7rem]"
+          >
+            {formatTime(activeTimer.time)}
+          </span>
           <div className="flex w-full flex-col gap-16">
             <Progress
               value={progress}
@@ -118,15 +127,16 @@ export default function PomodoroCard() {
               {controlButtons.map(({ id, Icon, tooltip, onClick }) => (
                 <ButtonWithTooltip
                   key={id}
+                  aria-label={id === "playback" ? (isIdle || isPaused ? "start" : "pause") : id}
                   className="group py-6"
                   tooltip={tooltip}
                   onClick={onClick}
-                  variant={id === "playstop" ? "default" : "outline"}
+                  variant={id === "playback" ? "default" : "outline"}
                 >
                   <Icon
                     className={cn(
                       "h-6 w-6 ",
-                      id === "playstop" ? "text-primary-foreground" : "text-primary/80 group-hover:text-primary",
+                      id === "playback" ? "text-primary-foreground" : "text-primary/80 group-hover:text-primary",
                     )}
                   />
                 </ButtonWithTooltip>
@@ -252,13 +262,15 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <ButtonWithTooltip tooltip="Pomodoro Settings" variant="ghost" className="group py-6">
+        <ButtonWithTooltip tooltip="Pomodoro Settings" aria-label="settings" variant="ghost" className="group py-6">
           <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
         </ButtonWithTooltip>
       </DialogTrigger>
       <DialogContent className="top-1/2">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Pomodoro Settings</DialogTitle>
+          <DialogTitle className="text-2xl" id="dialog-title">
+            Pomodoro Settings
+          </DialogTitle>
         </DialogHeader>
         <Separator />
         <div className="flex flex-col py-2">

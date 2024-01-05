@@ -52,3 +52,9 @@ export const tabs: Tabs = {
 };
 
 export const helper_tabsList = ["pomodoro", "shortBreak", "longBreak"] as const;
+
+export const defaultTimers = {
+  pomodoro: 25 * 60,
+  shortBreak: 5 * 60,
+  longBreak: 15 * 60,
+};
