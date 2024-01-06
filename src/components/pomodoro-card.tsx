@@ -11,6 +11,8 @@ import {
   RotateCcw as RotateCcwIcon,
   Settings as SettingsIcon,
   Hourglass as HourglassIcon,
+  Moon as MoonIcon,
+  Sun as SunIcon,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +29,7 @@ import stopSound from "@/assets/session-stop.mp3";
 import tabSound from "@/assets/tab-sound.mp3";
 import timerDoneSound from "@/assets/timer-done.mp3";
 import useSound from "use-sound";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function PomodoroCard() {
   const [playStartSound] = useSound(startSound, { volume: 0.2 });
@@ -100,12 +103,15 @@ export default function PomodoroCard() {
       <CardHeader className="px-0 pb-10 pt-0">
         <div className="flex items-baseline justify-between">
           <CardTitle className="text-3xl ">Pomodoro</CardTitle>
-          <Settings
-            pomodoroSession={pomodoroCountdown.session}
-            shortBreakSession={shortBreakCountdown.session}
-            longBreakSession={longBreakCountdown.session}
-            applySettings={applySettings}
-          />
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <Settings
+              pomodoroSession={pomodoroCountdown.session}
+              shortBreakSession={shortBreakCountdown.session}
+              longBreakSession={longBreakCountdown.session}
+              applySettings={applySettings}
+            />
+          </div>
         </div>
       </CardHeader>
       <Tabs value={activeTab.id} onValueChange={(value) => changeActiveTab(value as TabId)}>
@@ -167,7 +173,7 @@ export default function PomodoroCard() {
                   className="group py-6"
                   tooltip={tooltip}
                   onClick={onClick}
-                  variant={id === "playback" ? "default" : "outline"}
+                  variant={id === "playback" ? "default" : "ghost"}
                   {...rest}
                 >
                   <Icon
@@ -183,6 +189,17 @@ export default function PomodoroCard() {
         </TabsContent>
       </Tabs>
     </Card>
+  );
+}
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+  const Icon = theme === "dark" ? SunIcon : MoonIcon;
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  return (
+    <button className="p-4  text-primary/80 hover:text-primary" onClick={toggleTheme}>
+      <Icon className="size-5" />
+    </button>
   );
 }
 
@@ -296,11 +313,17 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
     },
   ];
 
+  const beautifyPreviewText = (label: string) => {
+    return (
+      (!(label === "Session") ? `${label.split(" ").at(0)} ${label.split(" ").at(1)?.toLowerCase()}` : label) + " "
+    );
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <ButtonWithTooltip tooltip="Pomodoro Settings" aria-label="settings" variant="ghost" className="group py-6">
-          <SettingsIcon className="h-5 w-5 text-primary/80 group-hover:text-primary" />
+          <SettingsIcon className="size-5 text-primary/80 group-hover:text-primary" />
         </ButtonWithTooltip>
       </DialogTrigger>
       <DialogContent className="top-1/2">
@@ -324,7 +347,10 @@ function Settings({ pomodoroSession, shortBreakSession, longBreakSession, applyS
                   <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
                 </div>
                 <div className="flex gap-2 text-sm">
-                  <span>Time Preview:</span>
+                  <span>
+                    {beautifyPreviewText(label)}
+                    preview:
+                  </span>
                   <span>{formatTime(mins * 60 + secs)}</span>
                 </div>
               </li>
