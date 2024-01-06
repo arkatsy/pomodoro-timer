@@ -1,10 +1,10 @@
 import { test, expect } from "vitest";
-import PomodoroCard from "@/components/pomodoro-card";
+import App from "@/App";
 import { getAllByRole, getByRole, render, userEvent } from "@/tests/utils";
 import { defaultTimers, formatTime } from "@/lib/utils";
 
 test("should render correctly", async () => {
-  const { container } = render(<PomodoroCard />);
+  const { container } = render(<App />);
 
   const settingsBtn = getByRole(container, "button", { name: "settings" });
   const tabs = getAllByRole(container, "tab");
@@ -27,7 +27,7 @@ test("should render correctly", async () => {
 
 test("should change tabs correctly", async () => {
   const user = userEvent.setup();
-  const { container } = render(<PomodoroCard />);
+  const { container } = render(<App />);
 
   const tabs = getAllByRole(container, "tab");
   const pomodoroTabBtn = getByRole(container, "tab", { name: "Pomodoro" });
