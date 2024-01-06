@@ -28,6 +28,7 @@ import startSound from "@/assets/session-start.mp3";
 import stopSound from "@/assets/session-stop.mp3";
 import tabSound from "@/assets/tab-sound.mp3";
 import timerDoneSound from "@/assets/timer-done.mp3";
+import waterDropSound from "@/assets/water-drop.mp3";
 import useSound from "use-sound";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -193,11 +194,17 @@ export default function PomodoroCard() {
 }
 
 function ThemeSwitcher() {
+  const [playWaterDropSound] = useSound(waterDropSound, { volume: 0.5 });
+
   const { theme, setTheme } = useTheme();
   const Icon = theme === "dark" ? SunIcon : MoonIcon;
-  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+
+  const handleClick = () => {
+    playWaterDropSound();
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
   return (
-    <button className="p-4  text-primary/80 hover:text-primary" onClick={toggleTheme}>
+    <button className="p-4  text-primary/80 hover:text-primary" onClick={handleClick}>
       <Icon className="size-5" />
     </button>
   );
