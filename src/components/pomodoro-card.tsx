@@ -1,4 +1,4 @@
-import { type ComponentProps, type ElementRef, forwardRef, useState, Fragment } from "react";
+import { type ComponentProps, type ElementRef, forwardRef, useState, Fragment, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { formatTime, cn, tabs, helper_tabsList, TabId } from "@/lib/utils";
@@ -22,8 +22,18 @@ import useTabTimers from "@/hooks/useTabTimers";
 import InputNumber from "./ui/input-number";
 import { LayoutGroup, motion } from "framer-motion";
 import { defaultTimers } from "@/lib/utils";
+import startSound from "@/assets/session-start.mp3";
+import stopSound from "@/assets/session-stop.mp3";
+import tabSound from "@/assets/tab-sound.mp3";
+import timerDoneSound from "@/assets/timer-done.mp3";
+import useSound from "use-sound";
 
 export default function PomodoroCard() {
+  const [playStartSound] = useSound(startSound, { volume: 0.2 });
+  const [playStopSound] = useSound(stopSound, { volume: 0.2 });
+  const [playTabSound] = useSound(tabSound, { volume: 0.2 });
+  const [playTimerDoneSound] = useSound(timerDoneSound, { volume: 0.2 });
+
   const {
     activeTab,
     changeActiveTab,
@@ -41,14 +51,31 @@ export default function PomodoroCard() {
         ? shortBreakCountdown
         : longBreakCountdown;
 
-  const handlePlaybackButtonClick = () =>
-    isIdle ? activeTimer.begin() : isRunning ? activeTimer.pause() : activeTimer.resume();
+  const handlePlaybackButtonClick = () => {
+    if (!isRunning) {
+      playStartSound();
+    } else {
+      playStopSound();
+    }
+    return isIdle ? activeTimer.begin() : isRunning ? activeTimer.pause() : activeTimer.resume();
+  };
+
+  const handleTabClick = () => {
+    playTabSound();
+  };
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      playTabSound();
+    }
+  };
 
   const isRunning = activeTimer.status === "running";
   const isIdle = activeTimer.status === "idle";
   const isPaused = activeTimer.status === "paused";
   const isBreak = !(+activeTab === 0);
   const shouldDisableTabs = isRunning;
+  const isTimerZero = activeTimer.time === 0;
   const progress = (activeTimer.time / activeTimer.session) * 100;
   const controlButtons = [
     { id: "reset", Icon: RotateCcwIcon, tooltip: "Reset Timer", onClick: activeTimer.reset },
@@ -57,9 +84,16 @@ export default function PomodoroCard() {
       Icon: isIdle || isPaused ? PlayIcon : PauseIcon,
       tooltip: "Start/Pause Timer",
       onClick: handlePlaybackButtonClick,
+      disabled: isTimerZero,
     },
     { id: "skip", Icon: FastForwardIcon, tooltip: isBreak ? "Skip Break" : "Skip Session", onClick: nextTab },
   ] as const;
+
+  useEffect(() => {
+    if (isTimerZero) {
+      playTimerDoneSound();
+    }
+  }, [isTimerZero]);
 
   return (
     <Card id="pomodoro-card" className="w-full min-w-[350px] max-w-lg space-y-0 p-10">
@@ -83,6 +117,8 @@ export default function PomodoroCard() {
                   aria-label={tabs[tabId].name}
                   value={tabId}
                   className="peer relative z-20 h-full w-full px-0 text-sm data-[state=active]:bg-transparent min-[400px]:text-base"
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKeyDown}
                   disabled={shouldDisableTabs}
                 >
                   {tabs[tabId].name}
@@ -124,7 +160,7 @@ export default function PomodoroCard() {
               }`}
             />
             <div className="flex w-full justify-center gap-8">
-              {controlButtons.map(({ id, Icon, tooltip, onClick }) => (
+              {controlButtons.map(({ id, Icon, tooltip, onClick, ...rest }) => (
                 <ButtonWithTooltip
                   key={id}
                   aria-label={id === "playback" ? (isIdle || isPaused ? "start" : "pause") : id}
@@ -132,6 +168,7 @@ export default function PomodoroCard() {
                   tooltip={tooltip}
                   onClick={onClick}
                   variant={id === "playback" ? "default" : "outline"}
+                  {...rest}
                 >
                   <Icon
                     className={cn(
