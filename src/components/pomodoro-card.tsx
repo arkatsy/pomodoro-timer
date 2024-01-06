@@ -74,6 +74,11 @@ export default function PomodoroCard() {
     }
   };
 
+  const handleSkipButtonClick = () => {
+    playTabSound();
+    nextTab();
+  }
+
   const isRunning = activeTimer.status === "running";
   const isIdle = activeTimer.status === "idle";
   const isPaused = activeTimer.status === "paused";
@@ -90,7 +95,7 @@ export default function PomodoroCard() {
       onClick: handlePlaybackButtonClick,
       disabled: isTimerZero,
     },
-    { id: "skip", Icon: FastForwardIcon, tooltip: isBreak ? "Skip Break" : "Skip Session", onClick: nextTab },
+    { id: "skip", Icon: FastForwardIcon, tooltip: isBreak ? "Skip Break" : "Skip Session", onClick: handleSkipButtonClick },
   ] as const;
 
   useEffect(() => {
