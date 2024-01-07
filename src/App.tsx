@@ -93,9 +93,9 @@ export default function App() {
 
   return (
     <ThemeProvider defaultTheme="dark">
-      <div className="flex justify-center">
-        <div className="flex w-full max-w-[1920px] flex-col items-center gap-32">
-          <div className="flex w-full justify-between p-12">
+      <div className="flex justify-center min-w-fit">
+        <div className="flex w-full  p-12 max-w-[1920px] flex-col items-center gap-32">
+          <div className="flex w-full justify-between items-baseline">
             <h3 className="text-3xl font-bold">Pomodoro</h3>
             <div>
               <ThemeSwitcher />
@@ -108,7 +108,7 @@ export default function App() {
             </div>
           </div>
           <Pomodoro>
-            <Pomodoro.Tabs value={activeTab.id} onValueChange={(value) => changeActiveTab(value as TabId)}>
+            <Pomodoro.Tabs className="flex w-full flex-col gap-12" value={activeTab.id} onValueChange={(value) => changeActiveTab(value as TabId)}>
               <Pomodoro.TabList>
                 {helper_tabsList.map((tabId) => (
                   <Pomodoro.Tab

@@ -15,11 +15,11 @@ type PomodoroTabsProps = {
   value: string;
   onValueChange: (newVal: string) => void;
   children: React.ReactNode;
-};
+} & ComponentProps<typeof Tabs>;
 
-function PomodoroTabs({ value, onValueChange, children }: PomodoroTabsProps) {
+function PomodoroTabs({ value, onValueChange, children, ...rest }: PomodoroTabsProps) {
   return (
-    <Tabs value={value} onValueChange={onValueChange}>
+    <Tabs value={value} onValueChange={onValueChange} {...rest}>
       {children}
     </Tabs>
   );
