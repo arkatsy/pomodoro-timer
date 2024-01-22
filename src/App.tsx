@@ -96,7 +96,7 @@ export default function App() {
       <div className="flex justify-center min-w-fit">
         <div className="flex w-full  p-12 max-w-[1920px] flex-col items-center gap-32">
           <div className="flex w-full justify-between items-baseline">
-            <h3 className="text-3xl font-bold">Pomodoro</h3>
+            <h3 className="text-3xl font-bold">Pomodoro.</h3>
             <div>
               <ThemeSwitcher />
               <Settings
