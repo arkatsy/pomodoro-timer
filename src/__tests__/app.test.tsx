@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import App from "@/_App";
+import App from "@/App.old";
 import { getAllByRole, getByRole, render, userEvent } from "@/tests/utils";
 import { defaultTimers, formatTime } from "@/lib/utils";
 
