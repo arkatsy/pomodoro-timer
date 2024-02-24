@@ -71,8 +71,14 @@
     @apply border-border;
   }
 
+  @media (prefers-reduced-motion) {
+    * {
+      transition: none !important;
+    }
+  }
+
   body {
-    @apply bg-background text-foreground transition-colors duration-300 motion-reduce:transition-none;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 
   ::selection {
