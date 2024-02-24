@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/hooks/useTheme";
 import useWindowSize from "@/hooks/useWindowSize";
 import { cn } from "@/lib/utils";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 const TABS: { id: TabId; name: string }[] = [
   { id: "pomodoro", name: "Pomodoro" },
@@ -20,15 +22,29 @@ const TABS: { id: TabId; name: string }[] = [
 const tabIds = ["pomodoro", "short-break", "long-break"] as const;
 type TabId = (typeof tabIds)[number];
 
+type ActiveTabStore = {
+  activeTabId: TabId;
+  setActiveTabId: (newTabId: TabId) => void;
+};
+
+const useActiveTabStore = create<ActiveTabStore>()(
+  persist(
+    (set) => ({
+      activeTabId: tabIds[0],
+      setActiveTabId: (newTabId) => set((state) => ({ activeTabId: newTabId })),
+    }),
+    { name: "active-tab" },
+  ),
+);
+
 // TODO: Hide logo in small screens (mobile ?)
 // TODO: Make sure reduced motion is respected
 // TODO: Move duration time to a source of truth place
 // TODO: Add action buttons
 // TODO: On mobile, the timer needs to be more at the center
-// TODO: Add zustand store with persistence store for the active tab
 // FIXME: On color mode change, the tab text color is changing with a delay (happens only on the inactive tabs) ?!
 export default function App() {
-  const [activeTabId, setActiveTabId] = useState<TabId>(TABS[0].id);
+  const { activeTabId, setActiveTabId } = useActiveTabStore();
   const [windowWidth] = useWindowSize(); // TODO: useWindowSize hook needs improvement (change initial value to null maybe ?)
   const [playTabSound] = useSound(tabSound, { volume: 0.2 });
   const isMobile = windowWidth > 0 && windowWidth < 640; // NOTE: Remember to update if change the useWindowSize hook
