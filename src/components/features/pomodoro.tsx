@@ -39,7 +39,7 @@ function PomodoroTabList({ children }: PomodoroTabListProps) {
 
 type PomodoroTabProps = {
   value: string;
-  activeTab: Tab;
+  activeTab?: Tab;
   children: React.ReactNode;
 } & ComponentProps<typeof TabsTrigger>;
 
@@ -47,14 +47,14 @@ function PomodoroTab({ value, activeTab, children, ...rest }: PomodoroTabProps) 
   return (
     <div className="relative z-0 h-full">
       <TabsTrigger
-        aria-label={tabs[value as TabId].name}
+        aria-label={activeTab && tabs[value as TabId].name}
         value={value}
         className="peer relative z-20 h-full w-full px-0 text-sm data-[state=active]:bg-transparent min-[400px]:text-base"
         {...rest}
       >
         {children}
       </TabsTrigger>
-      {activeTab.id === value && (
+      {activeTab && activeTab.id === value && (
         <motion.div
           className="absolute inset-0 z-10 rounded-md peer-data-[state=active]:bg-background peer-data-[state=active]:text-foreground peer-data-[state=active]:shadow-sm"
           layoutId="timer-tab"

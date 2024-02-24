@@ -19,7 +19,7 @@
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 240 4.8% 95.9%;
+    --muted: 240 4.8% 94%;
     --muted-foreground: 240 3.8% 46.1%;
 
     --accent: 240 4.8% 95.9%;
@@ -69,10 +69,12 @@
 @layer base {
   * {
     @apply border-border;
+    /* transition: none !importa */
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground transition-colors duration-300 motion-reduce:transition-none;
+    /* @apply bg-background text-foreground */
   }
 
   ::selection {
