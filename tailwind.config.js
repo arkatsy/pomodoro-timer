@@ -65,6 +65,13 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "theme-switch": "theme-switch 0.5s ease-out",
+      },
+    },
+    keyframes: {
+      "theme-switch": {
+        "0%": { opacity: "0" },
+        "100%": { opacity: "1" },
       },
     },
   },
