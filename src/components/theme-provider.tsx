@@ -14,15 +14,14 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "dark",
+  theme: "light",
   setTheme: () => null,
 };
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
-  children,
-  defaultTheme = "dark",
+  defaultTheme = "light",
   storageKey = "ui-theme",
   ...props
 }: ThemeProviderProps) {
@@ -44,10 +43,6 @@ export function ThemeProvider({
       setTheme(theme);
     },
   };
-
-  return (
-    <ThemeProviderContext.Provider {...props} value={value}>
-      {children}
-    </ThemeProviderContext.Provider>
-  );
+  
+  return <ThemeProviderContext.Provider {...props} value={value} />;
 }
