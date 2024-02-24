@@ -69,12 +69,10 @@
 @layer base {
   * {
     @apply border-border;
-    /* transition: none !importa */
   }
 
   body {
     @apply bg-background text-foreground transition-colors duration-300 motion-reduce:transition-none;
-    /* @apply bg-background text-foreground */
   }
 
   ::selection {
