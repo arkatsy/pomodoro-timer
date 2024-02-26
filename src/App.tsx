@@ -48,7 +48,7 @@ const useStore = create<Store>()(
       // prettier-ignore
       setActiveTabId: (newTabId) => set(produce((state) => { state.activeTabId = newTabId; })),
       // prettier-ignore
-      setPomodoro: (session: number) =>set(produce((state) => { state.timers.pomodoro = session; })),
+      setPomodoro: (session: number) => set(produce((state) => { state.timers.pomodoro = session; })),
       // prettier-ignore
       setShortBreak: (session: number) => set(produce((state) => { state.timers["short-break"] = session; })),
       // prettier-ignore
@@ -60,9 +60,6 @@ const useStore = create<Store>()(
 
 // TODO: Hide logo in small screens (mobile ?)
 // TODO: Move duration time to a source of truth place
-// TODO: Add action buttons
-// TODO: On mobile, the timer needs to be more at the center
-// FIXME: On color mode change, the tab text color is changing with a delay (happens only on the inactive tabs) ?!
 // FIXME: Absolute positioned header items (possibly) are ruining the tabing experience.
 export default function App() {
   const { activeTabId, setActiveTabId, timers } = useStore();
@@ -100,7 +97,7 @@ export default function App() {
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
-                  className="text-md peer relative z-20 h-full w-full rounded-none transition-colors duration-300 data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
+                  className="text-md peer relative z-20 h-full w-full rounded-none transition-[colors,_opacity_300ms] duration-300  data-[state=active]:bg-primary-foreground data-[state=inactive]:transition-opacity sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
                 >
                   {tab.name}
                 </TabsTrigger>
@@ -156,8 +153,12 @@ function Timer({ session }: { session: number }) {
     <div className="flex flex-col gap-32 sm:gap-20">
       <div className="flex items-center justify-center text-9xl font-medium">{formatTime(session)}</div>
       <div className="flex justify-center gap-8">
-        <Button variant="ghost" size="icon" className="size-20 group transition-colors duration-300 sm:size-16">
-          <RotateCcw className="size-10 sm:size-9 group-hover:opacity-100 opacity-70 duration-300 transition-opacity" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 transition-opacity duration-300 sm:size-16"
+        >
+          <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
         </Button>
         <Button
           variant="default"
@@ -173,8 +174,12 @@ function Timer({ session }: { session: number }) {
             <Play className="ml-1 size-10 sm:size-9" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" className="size-20 transition-colors duration-300 sm:size-16 group">
-          <SkipForward className="size-10 sm:size-9 opacity-70 group-hover:opacity-100 duration-300 transition-opacity" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 transition-opacity duration-300 sm:size-16"
+        >
+          <SkipForward className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
         </Button>
       </div>
     </div>
