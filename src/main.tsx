@@ -23,7 +23,7 @@ ReactDOM.createRoot(rootEl).render(
 
 function Dev() {
   return (
-    <div className="fixed left-0 top-0">
+    <div className="fixed left-1/2 top-0">
       <a className="underline" target="_blank" href="https://github.com/arkatsy/pomodoro-timer.git">
         Github
       </a>
