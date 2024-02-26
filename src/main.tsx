@@ -7,7 +7,10 @@ import { MotionConfig } from "framer-motion";
 
 const __DEV__ = import.meta.env.DEV;
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error("No root element found");
+
+ReactDOM.createRoot(rootEl).render(
   <StrictMode>
     <ThemeProvider>
       <MotionConfig reducedMotion="user">
