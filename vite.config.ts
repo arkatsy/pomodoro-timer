@@ -4,8 +4,10 @@ import path from "node:path";
 import { visualizer } from "rollup-plugin-visualizer";
 
 declare global {
-  interface ProcessEnv {
-    readonly ANALYZE: "true" | undefined;
+  namespace NodeJS {
+    interface ProcessEnv {
+      readonly ANALYZE: "true" | undefined;
+    }
   }
 }
 
