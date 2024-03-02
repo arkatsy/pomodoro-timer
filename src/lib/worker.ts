@@ -1,6 +1,6 @@
-self.addEventListener("message", (evt) => {
-  let id: NodeJS.Timeout | null = null;
+let id: NodeJS.Timeout | null = null;
 
+self.addEventListener("message", (evt) => {
   switch (evt.data.type) {
     case "START": {
       if (id) {
