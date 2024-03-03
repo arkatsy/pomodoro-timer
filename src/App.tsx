@@ -1,5 +1,5 @@
 import tabSound from "@/assets/tab-sound.wav";
-import ThemeToggle from "@/components/theme-toggle";
+import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useWindowSize from "@/hooks/useWindowSize";
@@ -11,14 +11,7 @@ import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSound from "use-sound";
 
-// TODO: Merge it with App or create a header component that includes logo + theme toggle
-function Logo() {
-  return <div className="select-none text-4xl font-semibold tracking-wide">Pomodoro</div>;
-}
-
-// TODO: Hide logo in small screens (mobile ?)
 // TODO: Move duration time to a source of truth place
-// FIXME: Absolute positioned header items (possibly) are ruining the tabing experience.
 export default function App() {
   const { activeTabId, setActiveTabId, sessions } = useStore();
   const [windowWidth] = useWindowSize(); // TODO: useWindowSize hook needs improvement (change initial value to null maybe ?)
@@ -32,12 +25,7 @@ export default function App() {
 
   return (
     <div className="min-h-dvh">
-      <div className="absolute right-10 top-10 sm:right-20 sm:top-20">
-        <ThemeToggle />
-      </div>
-      <div className="absolute left-10 top-[2.3rem] sm:left-20 sm:top-[4.5rem]">
-        <Logo />
-      </div>
+      <Header />
       <div id="experience" className="flex min-h-dvh items-center justify-center">
         <Tabs
           value={activeTabId}
@@ -146,7 +134,7 @@ function Timer({ sessionTime }: { sessionTime: number }) {
         <Button
           variant="ghost"
           size="icon"
-          className="group size-20 transition-opacity duration-300 sm:size-16"
+          className="group size-20 transition-opacity duration-300 sm:size-16 pointer-events-none"
           onClick={handleResetClick}
         >
           <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
