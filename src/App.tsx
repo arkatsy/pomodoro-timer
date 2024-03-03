@@ -1,19 +1,20 @@
-import switchOff from "@/assets/switch-off.wav";
-import switchOn from "@/assets/switch-on.wav";
 import tabSound from "@/assets/tab-sound.wav";
+import ThemeToggle from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTheme } from "@/hooks/useTheme";
 import useWindowSize from "@/hooks/useWindowSize";
 import useStore from "@/lib/store";
 import worker from "@/lib/time-worker";
 import { TabId, cn, formatTime, tabs } from "@/lib/utils";
-import { Expand } from "@theme-toggles/react";
-import "@theme-toggles/react/css/Expand.css";
 import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSound from "use-sound";
+
+// TODO: Merge it with App or create a header component that includes logo + theme toggle
+function Logo() {
+  return <div className="select-none text-4xl font-semibold tracking-wide">Pomodoro</div>;
+}
 
 // TODO: Hide logo in small screens (mobile ?)
 // TODO: Move duration time to a source of truth place
@@ -85,6 +86,8 @@ export default function App() {
   );
 }
 
+// TODO: Add sounds to the buttons
+// TODO: Add tooltip to the buttons
 function Timer({ sessionTime }: { sessionTime: number }) {
   const [count, setCount] = useState(sessionTime);
   const [status, setStatus] = useState<"idle" | "running" | "stopped" | "done">("idle");
@@ -172,37 +175,5 @@ function Timer({ sessionTime }: { sessionTime: number }) {
         </Button>
       </div>
     </div>
-  );
-}
-
-function Logo() {
-  return <div className="select-none text-4xl font-semibold tracking-wide">Pomodoro</div>;
-}
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [playSwitchOnSound] = useSound(switchOn, { volume: 0.5 });
-  const [playSwitchOffSound] = useSound(switchOff, { volume: 0.5 });
-
-  const toggleTheme = () => {
-    if (theme === "light") {
-      playSwitchOnSound();
-      setTheme("dark");
-    } else {
-      playSwitchOffSound();
-      setTheme("light");
-    }
-  };
-
-  const isDark = theme === "dark";
-
-  return (
-    <Expand
-      placeholder={isDark ? "🌙" : "☀️"}
-      className="p-1 text-3xl"
-      duration={300}
-      toggle={toggleTheme}
-      toggled={isDark}
-    />
   );
 }
