@@ -78,7 +78,7 @@ type Store = {
 
 const defaultSessions = {
   pomodoro: 25 * 60, // 25 minutes
-  "short-break": 3 * 60, // 5 minutes
+  "short-break": 5 * 60, // 5 minutes
   "long-break": 15 * 60, // 15 minutes
 };
 
