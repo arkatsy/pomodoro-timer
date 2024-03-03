@@ -1,132 +1,19 @@
 import switchOff from "@/assets/switch-off.wav";
 import switchOn from "@/assets/switch-on.wav";
 import tabSound from "@/assets/tab-sound.wav";
-import { Expand } from "@theme-toggles/react";
-import "@theme-toggles/react/css/Expand.css";
-import { motion } from "framer-motion";
-import useSound from "use-sound";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/hooks/useTheme";
 import useWindowSize from "@/hooks/useWindowSize";
-import { cn, formatTime } from "@/lib/utils";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { produce } from "immer";
-import { Button } from "./components/ui/button";
+import useStore from "@/lib/store";
+import worker from "@/lib/time-worker";
+import { TabId, cn, formatTime, tabs } from "@/lib/utils";
+import { Expand } from "@theme-toggles/react";
+import "@theme-toggles/react/css/Expand.css";
+import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const TABS: { id: TabId; name: string }[] = [
-  { id: "pomodoro", name: "Pomodoro" },
-  { id: "short-break", name: "Short Break" },
-  { id: "long-break", name: "Long Break" },
-];
-
-// TODO: Improve types for TimeWorker & actual worker
-// TODO: Move to separate file
-class TimeWorker {
-  static instance: TimeWorker | null = null;
-  private worker = new Worker(new URL("./lib/worker.ts", import.meta.url));
-  private listeners = new Set<() => void>();
-
-  constructor() {
-    if (TimeWorker.instance) {
-      return TimeWorker.instance;
-    }
-
-    TimeWorker.instance = this;
-
-    this.worker.addEventListener("message", (e) => {
-      if (e.data.type === "TICK") {
-        this.listeners.forEach((cb) => cb());
-      }
-    });
-  }
-
-  start() {
-    this.worker.postMessage({ type: "START" });
-  }
-
-  stop() {
-    this.worker.postMessage({ type: "STOP" });
-  }
-
-  subscribe(cb: () => void) {
-    this.listeners.add(cb);
-  }
-
-  unsubscribe(cb: () => void) {
-    this.listeners.delete(cb);
-  }
-}
-
-const worker = Object.freeze(new TimeWorker());
-
-const tabIds = ["pomodoro", "short-break", "long-break"] as const;
-type TabId = (typeof tabIds)[number];
-
-type Store = {
-  activeTabId: TabId;
-  sessions: Record<TabId, number>;
-
-  setActiveTabId: (newTabId: TabId) => void;
-  nextTab: () => void;
-  setPomodoro: (session: number) => void;
-  setShortBreak: (session: number) => void;
-  setLongBreak: (session: number) => void;
-};
-
-const defaultSessions = {
-  pomodoro: 25 * 60, // 25 minutes
-  "short-break": 5 * 60, // 5 minutes
-  "long-break": 15 * 60, // 15 minutes
-};
-
-const useStore = create<Store>()(
-  persist(
-    (set) => ({
-      activeTabId: tabIds[0],
-      sessions: {
-        pomodoro: defaultSessions.pomodoro,
-        "short-break": defaultSessions["short-break"],
-        "long-break": defaultSessions["long-break"],
-      },
-      // prettier-ignore
-      setActiveTabId: (newTabId) => set(produce((state) => {
-        worker.stop();
-        state.activeTabId = newTabId;
-      })),
-      // prettier-ignore
-      nextTab: () => set(produce((state) => {
-            worker.stop();
-            state.activeTabId =
-              state.activeTabId === "pomodoro"
-                ? "short-break"
-                : state.activeTabId === "short-break"
-                  ? "long-break"
-                  : "pomodoro";
-          })),
-      // prettier-ignore
-      setPomodoro: (session) => set(produce((state) => {
-        worker.stop();
-        state.sessions.pomodoro = session;
-       })),
-      // prettier-ignore
-      setShortBreak: (session) => set(produce((state) => { 
-        worker.stop();
-        state.sessions["short-break"] = session; 
-      })),
-      // prettier-ignore
-      setLongBreak: (session) => set(produce((state) => { 
-        worker.stop();
-        state.sessions["long-break"] = session; 
-      })),
-    }),
-    {
-      name: "store",
-    },
-  ),
-);
+import useSound from "use-sound";
 
 // TODO: Hide logo in small screens (mobile ?)
 // TODO: Move duration time to a source of truth place
@@ -162,7 +49,7 @@ export default function App() {
               isMobile && "rounded-none p-0",
             )}
           >
-            {TABS.map((tab) => (
+            {tabs.map((tab) => (
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
@@ -187,7 +74,7 @@ export default function App() {
               </div>
             ))}
           </TabsList>
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>
               <Timer sessionTime={sessions[activeTabId]} />
             </TabsContent>

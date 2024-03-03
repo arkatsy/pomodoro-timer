@@ -21,40 +21,28 @@ if (import.meta.vitest) {
     { input: 10, expected: "0:10" },
     { input: 30, expected: "0:30" },
     { input: 1 * 60, expected: "1:00" },
-    // prettier-ignore
-    { input: (1 * 60) + 1, expected: "1:01" },
+    { input: 1 * 60 + 1, expected: "1:01" },
     { input: 10 * 60, expected: "10:00" },
-    // prettier-ignore
-    { input: (10 * 60) + 1, expected: "10:01" },
+    { input: 10 * 60 + 1, expected: "10:01" },
     { input: 45 * 60, expected: "45:00" },
     { input: 60 * 60, expected: "60:00" },
-    // prettier-ignore
-    { input: (60 * 60) + 1, expected: "60:01" },
+    { input: 60 * 60 + 1, expected: "60:01" },
   ])("formatTime($input) === $expected", ({ input, expected }) => {
     expect(formatTime(input)).toBe(expected);
   });
 }
 
-export type TabId = "pomodoro" | "shortBreak" | "longBreak";
-export type Tab = {
-  id: TabId;
-  name: string;
+export const defaultSessions: Record<TabId, number> = {
+  pomodoro: 25 * 60, // 25 mins
+  "short-break": 5 * 60, // 5 mins
+  "long-break": 15 * 60, // 15 mins
 };
 
-export type Tabs = {
-  [key in TabId]: Tab;
-};
+export const tabIds = ["pomodoro", "short-break", "long-break"] as const;
+export type TabId = (typeof tabIds)[number];
 
-export const tabs: Tabs = {
-  pomodoro: { id: "pomodoro", name: "Pomodoro" },
-  shortBreak: { id: "shortBreak", name: "Short Break" },
-  longBreak: { id: "longBreak", name: "Long Break" },
-};
-
-export const helper_tabsList = ["pomodoro", "shortBreak", "longBreak"] as const;
-
-export const defaultTimers = {
-  pomodoro: 25 * 60,
-  shortBreak: 5 * 60,
-  longBreak: 15 * 60,
-};
+export const tabs: { id: TabId; name: string }[] = [
+  { id: "pomodoro", name: "Pomodoro" },
+  { id: "short-break", name: "Short Break" },
+  { id: "long-break", name: "Long Break" },
+];
