@@ -24,9 +24,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-dvh">
+    <div className="flex min-h-dvh flex-col gap-52">
       <Header />
-      <div id="experience" className="flex min-h-dvh items-center justify-center">
+      <div id="experience" className="flex items-center justify-center">
         <Tabs
           value={activeTabId}
           onValueChange={onTabChange}
@@ -134,7 +134,7 @@ function Timer({ sessionTime }: { sessionTime: number }) {
         <Button
           variant="ghost"
           size="icon"
-          className="group size-20 transition-opacity duration-300 sm:size-16 pointer-events-none"
+          className="group size-20 transition-opacity duration-300 sm:size-16"
           onClick={handleResetClick}
         >
           <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
