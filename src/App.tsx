@@ -8,7 +8,7 @@ import worker from "@/lib/time-worker";
 import { TabId, cn, formatTime, tabs } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 
 // TODO: Move duration time to a source of truth place
@@ -81,28 +81,57 @@ function Timer({ sessionTime }: { sessionTime: number }) {
   const [status, setStatus] = useState<"idle" | "running" | "stopped" | "done">("idle");
   const nextTab = useStore((state) => state.nextTab);
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    Notification.permission,
+  );
+  const notificationRef = useRef<Notification | null>(null);
 
   const isRunning = status === "running";
   const isStopped = status === "stopped";
   const isIdle = status === "idle";
 
-  const onTimeTick = () => {
-    setCount((prev) => prev - 1);
+  // TODO: Preferably this would be better inside the onTimeTick callback
+  //       Reminder, the issue was the stale count value
+  useEffect(() => {
     if (count === 0) {
       worker.stop();
       setStatus("done");
+      if (notificationPermission === "granted") {
+        notificationRef.current = new Notification("Time's up!", {
+          body: "TODO",
+        });
+      }
     }
-  };
+  }, [count]);
 
   useEffect(() => {
+    const onTimeTick = () => {
+      setCount((count) => count - 1);
+    };
+
+    // NOTE: If it gets too cumbersome, move it to a separate useEffect and / or a custom hook
+    const onVisibilityChange = () => {
+      if (!notificationRef.current) return;
+      if (document.visibilityState === "visible") {
+        notificationRef.current.close();
+        notificationRef.current = null;
+      }
+    };
+
     worker.subscribe(onTimeTick);
+    window.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       worker.unsubscribe(onTimeTick);
+      window.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
   const handlePlayClick = () => {
+    Notification.requestPermission().then((result: NotificationPermission) => {
+      setNotificationPermission(result);
+    });
+
     if (isIdle || isStopped) {
       worker.start();
       setStatus("running");
