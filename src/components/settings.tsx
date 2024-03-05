@@ -28,16 +28,12 @@ export default function Settings() {
           <SettingsIcon className="size-7 text-primary duration-300 group-hover:text-primary group-focus-visible:text-primary sm:size-8 sm:text-primary/80" />
         </button>
       </DialogTrigger>
-      {open ? (
-        <DialogSettingsContent key={crypto.randomUUID()} />
-      ) : (
-        <DialogSettingsContent key={crypto.randomUUID()} />
-      )}
+      <DialogSettingsContent open={open} />
     </Dialog>
   );
 }
 
-function DialogSettingsContent() {
+function DialogSettingsContent({ open }: { open: boolean }) {
   const { sessions, setPomodoro, setShortBreak, setLongBreak } = useStore((state) => ({
     sessions: state.sessions,
     setPomodoro: state.setPomodoro,
@@ -59,6 +55,14 @@ function DialogSettingsContent() {
   const longBreakSecs = Math.trunc(draftSettings.longBreak % 60);
 
   const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    setDraftSettings({
+      pomodoro: sessions.pomodoro,
+      shortBreak: sessions["short-break"],
+      longBreak: sessions["long-break"],
+    });
+  }, [open]);
 
   useEffect(() => {
     setDisabled(
