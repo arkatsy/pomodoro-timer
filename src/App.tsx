@@ -1,9 +1,11 @@
+import notificationIcon from "@/assets/notification-icon.png";
 import tabSound from "@/assets/tab-sound.wav";
 import timerDoneSound from "@/assets/timer-done.mp3";
+import playStopSound from "@/assets/water-drop.wav";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useWindowSize from "@/hooks/useWindowSize";
+import useMediaQuery from "@/hooks/useMediaQuery";
 import useStore from "@/lib/store";
 import worker from "@/lib/time-worker";
 import { TabId, cn, formatTime, tabs } from "@/lib/utils";
@@ -11,15 +13,12 @@ import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
-import notificationIcon from "./assets/notification-icon.png";
-import playStopSound from "./assets/water-drop.wav"
 
 // TODO: Move duration time to a source of truth place
 export default function App() {
+  const isMobile = useMediaQuery("(max-width: 640px)");
   const { activeTabId, setActiveTabId, sessions } = useStore();
-  const [windowWidth] = useWindowSize(); // TODO: useWindowSize hook needs improvement (change initial value to null maybe ?)
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
-  const isMobile = windowWidth > 0 && windowWidth < 640; // NOTE: Remember to update if change the useWindowSize hook
 
   const onTabChange = (newTabId: string) => {
     playTabSound();
@@ -89,7 +88,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
     Notification.permission,
   );
   const [playTimerDoneSound] = useSound(timerDoneSound, { volume: 0.5 });
-  const [playPlayStopSound] = useSound(playStopSound, { volume: 0.8 })
+  const [playPlayStopSound] = useSound(playStopSound, { volume: 0.8 });
   const notificationRef = useRef<Notification | null>(null);
 
   const isRunning = status === "running";
@@ -97,7 +96,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const isIdle = status === "idle";
 
   const tabName = tabs.find((tab) => tab.id === type)!.name;
-  
+
   // TODO: Preferably this would be better inside the onTimeTick callback
   //       Reminder, the issue was the stale count value
   useEffect(() => {
@@ -109,7 +108,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
         notificationRef.current = new Notification(`${tabName}`, {
           body: `Your ${tabName.split(" ").at(1)?.toLowerCase()} ${type === "pomodoro" ? "session" : ""} has finished`,
           icon: notificationIcon,
-        })
+        });
       }
     }
   }, [count]);
