@@ -1,4 +1,5 @@
 import tabSound from "@/assets/tab-sound.wav";
+import timerDoneSound from "@/assets/timer-done.mp3";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +11,8 @@ import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
+import notificationIcon from "./assets/notification-icon.png";
+import playStopSound from "./assets/water-drop.wav"
 
 // TODO: Move duration time to a source of truth place
 export default function App() {
@@ -65,7 +68,7 @@ export default function App() {
           </TabsList>
           {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>
-              <Timer sessionTime={sessions[activeTabId]} />
+              <Timer sessionTime={sessions[activeTabId]} type={activeTabId} />
             </TabsContent>
           ))}
         </Tabs>
@@ -76,7 +79,8 @@ export default function App() {
 
 // TODO: Add sounds to the buttons
 // TODO: Add tooltip to the buttons
-function Timer({ sessionTime }: { sessionTime: number }) {
+// TODO: Code cleanup
+function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const [count, setCount] = useState(sessionTime);
   const [status, setStatus] = useState<"idle" | "running" | "stopped" | "done">("idle");
   const nextTab = useStore((state) => state.nextTab);
@@ -84,22 +88,28 @@ function Timer({ sessionTime }: { sessionTime: number }) {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
     Notification.permission,
   );
+  const [playTimerDoneSound] = useSound(timerDoneSound, { volume: 0.5 });
+  const [playPlayStopSound] = useSound(playStopSound, { volume: 0.8 })
   const notificationRef = useRef<Notification | null>(null);
 
   const isRunning = status === "running";
   const isStopped = status === "stopped";
   const isIdle = status === "idle";
 
+  const tabName = tabs.find((tab) => tab.id === type)!.name;
+  
   // TODO: Preferably this would be better inside the onTimeTick callback
   //       Reminder, the issue was the stale count value
   useEffect(() => {
     if (count === 0) {
       worker.stop();
       setStatus("done");
+      playTimerDoneSound();
       if (notificationPermission === "granted") {
-        notificationRef.current = new Notification("Time's up!", {
-          body: "TODO",
-        });
+        notificationRef.current = new Notification(`${tabName}`, {
+          body: `Your ${tabName.split(" ").at(1)?.toLowerCase()} ${type === "pomodoro" ? "session" : ""} has finished`,
+          icon: notificationIcon,
+        })
       }
     }
   }, [count]);
@@ -131,6 +141,7 @@ function Timer({ sessionTime }: { sessionTime: number }) {
     Notification.requestPermission().then((result: NotificationPermission) => {
       setNotificationPermission(result);
     });
+    playPlayStopSound();
 
     if (isIdle || isStopped) {
       worker.start();
