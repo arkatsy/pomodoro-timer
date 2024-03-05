@@ -8,11 +8,33 @@ import useSound from "use-sound";
 import volumeOffSound from "@/assets/volume-off.mp3";
 import volumeOnSound from "@/assets/volume-on.mp3";
 import useStore from "@/lib/store";
+import useMediaQuery from "@/hooks/useMediaQuery";
+import Settings from "./settings";
 
 export default function Header() {
+  const isMobile = useMediaQuery("(max-width: 640px)");
+  const { sessions, setPomodoro, setLongBreak, setShortBreak } = useStore((state) => ({
+    sessions: state.sessions,
+    setPomodoro: state.setPomodoro,
+    setLongBreak: state.setLongBreak,
+    setShortBreak: state.setShortBreak,
+  }));
+
   return (
-    <div className="flex justify-between px-6 pt-8 sm:px-24 sm:pt-16">
-      <Logo />
+    <div className="flex w-full justify-between px-6 pt-8 sm:justify-between sm:px-24 sm:pt-16">
+      {isMobile && (
+        <Settings
+          applySettings={(settings) => {
+            setPomodoro(settings.pomodoro);
+            setShortBreak(settings.shortBreak);
+            setLongBreak(settings.longBreak);
+          }}
+          pomodoroSession={sessions.pomodoro}
+          shortBreakSession={sessions["short-break"]}
+          longBreakSession={sessions["long-break"]}
+        />
+      )}
+      {!isMobile && <Logo />}
       <div className="flex gap-10">
         <VolumeToggle />
         <ThemeToggle />
@@ -81,6 +103,7 @@ function VolumeToggle() {
     </button>
   );
 }
+
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const muted = useStore((state) => state.muted);

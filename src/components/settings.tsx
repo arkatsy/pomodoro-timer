@@ -1,13 +1,19 @@
 import { produce } from "immer";
 import { ClockIcon, HourglassIcon, SettingsIcon } from "lucide-react";
 import { useState } from "react";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import TooltipButton from "../ui/tooltip-button";
-import { Separator } from "../ui/separator";
-import { Label } from "../ui/label";
-import InputNumber from "../ui/input-number";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import InputNumber from "@/components/ui/input-number";
 import { formatTime } from "@/lib/utils";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 type SettingsProps = {
   pomodoroSession: number;
@@ -16,6 +22,7 @@ type SettingsProps = {
   applySettings: (newSettings: { pomodoro: number; shortBreak: number; longBreak: number }) => void;
 };
 
+// TODO: Rewrite
 export default function Settings({
   pomodoroSession,
   shortBreakSession,
@@ -126,16 +133,18 @@ export default function Settings({
 
   const beautifyPreviewText = (label: string) => {
     return (
-      (!(label === "Session") ? `${label.split(" ").at(0)} ${label.split(" ").at(1)?.toLowerCase()}` : label) + " "
+      (!(label === "Session")
+        ? `${label.split(" ").at(0)} ${label.split(" ").at(1)?.toLowerCase()}`
+        : label) + " "
     );
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <TooltipButton tooltip="Open Settings" aria-label="settings" variant="ghost" className="group py-6">
-          <SettingsIcon className="size-5 text-primary/80 group-hover:text-primary" />
-        </TooltipButton>
+        <button className="group p-1" aria-label="Settings">
+          <SettingsIcon className="size-7 sm:size-8 text-primary sm:text-primary/80 duration-300 group-hover:text-primary group-focus-visible:text-primary" />
+        </button>
       </DialogTrigger>
       <DialogContent className="top-1/2">
         <DialogHeader>
@@ -153,7 +162,13 @@ export default function Settings({
                   <span>{label}</span>
                 </Label>
                 <div className="flex items-center">
-                  <InputNumber id={label} min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
+                  <InputNumber
+                    id={label}
+                    min={0}
+                    max={999}
+                    onValueChange={onMinsChange}
+                    defaultValue={mins}
+                  />
                   <Separator className="-ml-2 w-4" />
                   <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
                 </div>

@@ -13,11 +13,13 @@ import { motion } from "framer-motion";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
+import Settings from "@/components/settings";
 
 // TODO: Move duration time to a source of truth place
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const { activeTabId, setActiveTabId, sessions, muted } = useStore();
+  const { activeTabId, setActiveTabId, sessions, muted, setPomodoro, setLongBreak, setShortBreak } =
+    useStore();
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
 
   const onTabChange = (newTabId: string) => {
@@ -26,9 +28,9 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col gap-52">
+    <div className="flex min-h-dvh flex-col items-center">
       <Header />
-      <div id="experience" className="flex items-center justify-center">
+      <div id="experience" className="flex grow items-center justify-center">
         <Tabs
           value={activeTabId}
           onValueChange={onTabChange}
@@ -66,12 +68,26 @@ export default function App() {
             ))}
           </TabsList>
           {tabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id}>
+            <TabsContent className="w-full p-4" key={tab.id} value={tab.id}>
               <Timer sessionTime={sessions[activeTabId]} type={activeTabId} />
             </TabsContent>
           ))}
         </Tabs>
       </div>
+      {!isMobile && (
+        <div className="mb-24">
+          <Settings
+            applySettings={(settings) => {
+              setPomodoro(settings.pomodoro);
+              setShortBreak(settings.shortBreak);
+              setLongBreak(settings.longBreak);
+            }}
+            longBreakSession={sessions["long-break"]}
+            shortBreakSession={sessions["short-break"]}
+            pomodoroSession={sessions.pomodoro}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -181,7 +197,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
           className="group size-20 transition-opacity duration-300 sm:size-16"
           onClick={handleResetClick}
         >
-          <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
+          <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
         <Button
           variant="default"
@@ -203,7 +219,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
           className="group size-20 transition-opacity duration-300 sm:size-16"
           onClick={handleSkipClick}
         >
-          <SkipForward className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 sm:size-9" />
+          <SkipForward className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
       </div>
     </div>
