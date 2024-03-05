@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import { ClockIcon, HourglassIcon, SettingsIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -14,92 +14,110 @@ import { Label } from "@/components/ui/label";
 import InputNumber from "@/components/ui/input-number";
 import { formatTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import useStore from "@/lib/store";
 
-type SettingsProps = {
-  pomodoroSession: number;
-  shortBreakSession: number;
-  longBreakSession: number;
-  applySettings: (newSettings: { pomodoro: number; shortBreak: number; longBreak: number }) => void;
-};
+export default function Settings() {
+  const [open, setOpen] = useState(false);
 
-// TODO: Rewrite
-export default function Settings({
-  pomodoroSession,
-  shortBreakSession,
-  longBreakSession,
-  applySettings,
-}: SettingsProps) {
-  const [settings, setSettings] = useState({
-    pomodoro: {
-      mins: pomodoroSession / 60,
-      secs: pomodoroSession % 60,
-    },
-    shortBreak: {
-      mins: shortBreakSession / 60,
-      secs: shortBreakSession % 60,
-    },
-    longBreak: {
-      mins: longBreakSession / 60,
-      secs: longBreakSession % 60,
-    },
+  const openSettingsDialog = () => setOpen(true);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button className="group p-2" aria-label="Settings" onClick={openSettingsDialog}>
+          <SettingsIcon className="size-7 text-primary duration-300 group-hover:text-primary group-focus-visible:text-primary sm:size-8 sm:text-primary/80" />
+        </button>
+      </DialogTrigger>
+      {open ? (
+        <DialogSettingsContent key={crypto.randomUUID()} />
+      ) : (
+        <DialogSettingsContent key={crypto.randomUUID()} />
+      )}
+    </Dialog>
+  );
+}
+
+function DialogSettingsContent() {
+  const { sessions, setPomodoro, setShortBreak, setLongBreak } = useStore((state) => ({
+    sessions: state.sessions,
+    setPomodoro: state.setPomodoro,
+    setShortBreak: state.setShortBreak,
+    setLongBreak: state.setLongBreak,
+  }));
+
+  const [draftSettings, setDraftSettings] = useState({
+    pomodoro: sessions.pomodoro,
+    shortBreak: sessions["short-break"],
+    longBreak: sessions["long-break"],
   });
 
-  const handleSettingsDone = () => {
-    const newPomodoroTime = settings.pomodoro.mins * 60 + settings.pomodoro.secs;
-    const newShortBreakSession = settings.shortBreak.mins * 60 + settings.shortBreak.secs;
-    const newLongBreakSession = settings.longBreak.mins * 60 + settings.longBreak.secs;
+  const pomodoroMins = Math.trunc(draftSettings.pomodoro / 60);
+  const pomodoroSecs = Math.trunc(draftSettings.pomodoro % 60);
+  const shortBreakMins = Math.trunc(draftSettings.shortBreak / 60);
+  const shortBreakSecs = Math.trunc(draftSettings.shortBreak % 60);
+  const longBreakMins = Math.trunc(draftSettings.longBreak / 60);
+  const longBreakSecs = Math.trunc(draftSettings.longBreak % 60);
 
-    applySettings({
-      pomodoro: newPomodoroTime,
-      shortBreak: newShortBreakSession,
-      longBreak: newLongBreakSession,
-    });
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    setDisabled(
+      draftSettings.pomodoro === sessions.pomodoro &&
+        draftSettings.shortBreak === sessions["short-break"] &&
+        draftSettings.longBreak === sessions["long-break"],
+    );
+  }, [draftSettings.pomodoro, draftSettings.shortBreak, draftSettings.longBreak, sessions]);
+
+  const handleSettingsDone = () => {
+    setPomodoro(draftSettings.pomodoro);
+    setShortBreak(draftSettings.shortBreak);
+    setLongBreak(draftSettings.longBreak);
   };
 
   const handlePomodoroMinsChange = (mins: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.pomodoro.mins = mins;
+        draft.pomodoro = mins * 60 + pomodoroSecs;
       }),
     );
   };
 
   const handlePomodoroSecsChange = (secs: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.pomodoro.secs = secs;
+        draft.pomodoro = pomodoroMins * 60 + secs;
       }),
     );
   };
 
   const handleShortBreakMinsChange = (mins: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.shortBreak.mins = mins;
+        draft.shortBreak = mins * 60 + shortBreakSecs;
       }),
     );
   };
 
   const handleShortBreakSecsChange = (secs: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.shortBreak.secs = secs;
+        draft.shortBreak = shortBreakMins * 60 + secs;
       }),
     );
   };
 
   const handleLongBreakMinsChange = (mins: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.longBreak.mins = mins;
+        draft.longBreak = mins * 60 + longBreakSecs;
       }),
     );
   };
 
   const handleLongBreakSecsChange = (secs: number) => {
-    setSettings(
+    setDraftSettings(
       produce((draft) => {
-        draft.longBreak.secs = secs;
+        draft.longBreak = longBreakMins * 60 + secs;
       }),
     );
   };
@@ -108,24 +126,24 @@ export default function Settings({
     {
       Icon: ClockIcon,
       label: "Session",
-      mins: settings.pomodoro.mins,
-      secs: settings.pomodoro.secs,
+      mins: pomodoroMins,
+      secs: pomodoroSecs,
       onMinsChange: handlePomodoroMinsChange,
       onSecsChange: handlePomodoroSecsChange,
     },
     {
       Icon: HourglassIcon,
       label: "Short Break",
-      mins: settings.shortBreak.mins,
-      secs: settings.shortBreak.secs,
+      mins: shortBreakMins,
+      secs: shortBreakSecs,
       onMinsChange: handleShortBreakMinsChange,
       onSecsChange: handleShortBreakSecsChange,
     },
     {
       Icon: HourglassIcon,
       label: "Long Break",
-      mins: settings.longBreak.mins,
-      secs: settings.longBreak.secs,
+      mins: longBreakMins,
+      secs: longBreakSecs,
       onMinsChange: handleLongBreakMinsChange,
       onSecsChange: handleLongBreakSecsChange,
     },
@@ -140,55 +158,42 @@ export default function Settings({
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className="group p-1" aria-label="Settings">
-          <SettingsIcon className="size-7 sm:size-8 text-primary sm:text-primary/80 duration-300 group-hover:text-primary group-focus-visible:text-primary" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="top-1/2">
-        <DialogHeader>
-          <DialogTitle className="text-2xl" id="dialog-title">
-            Pomodoro Settings
-          </DialogTitle>
-        </DialogHeader>
-        <Separator />
-        <div className="flex flex-col py-2">
-          <ul className="flex flex-col gap-12">
-            {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange, Icon }) => (
-              <li key={label} className="flex flex-col gap-4">
-                <Label className="flex w-fit items-center gap-2 text-lg font-bold" htmlFor={label}>
-                  <Icon className="size-5" />
-                  <span>{label}</span>
-                </Label>
-                <div className="flex items-center">
-                  <InputNumber
-                    id={label}
-                    min={0}
-                    max={999}
-                    onValueChange={onMinsChange}
-                    defaultValue={mins}
-                  />
-                  <Separator className="-ml-2 w-4" />
-                  <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
-                </div>
-                <div className="flex gap-2 text-sm">
-                  <span>
-                    {beautifyPreviewText(label)}
-                    preview:
-                  </span>
-                  <span>{formatTime(mins * 60 + secs)}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <DialogClose asChild>
-            <Button className="w-min self-end" onClick={handleSettingsDone}>
-              Done
-            </Button>
-          </DialogClose>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <DialogContent className="top-1/2">
+      <DialogHeader>
+        <DialogTitle className="text-2xl" id="dialog-title">
+          Settings
+        </DialogTitle>
+      </DialogHeader>
+      <Separator />
+      <div className="flex flex-col py-2">
+        <ul className="flex flex-col gap-12">
+          {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange, Icon }) => (
+            <li key={label} className="flex flex-col gap-4">
+              <Label className="flex w-fit items-center gap-2 text-lg font-medium" htmlFor={label}>
+                <Icon className="size-5" />
+                <span>{label}</span>
+              </Label>
+              <div className="flex items-center">
+                <InputNumber id={label} min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
+                <Separator className="-ml-2 w-4" />
+                <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
+              </div>
+              <div className="flex gap-2 text-sm">
+                <span>
+                  {beautifyPreviewText(label)}
+                  preview:
+                </span>
+                <span>{formatTime(mins * 60 + secs)}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <DialogClose asChild>
+          <Button className="w-min self-end" onClick={handleSettingsDone} disabled={disabled}>
+            Save
+          </Button>
+        </DialogClose>
+      </div>
+    </DialogContent>
   );
 }

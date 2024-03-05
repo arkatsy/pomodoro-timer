@@ -13,27 +13,10 @@ import Settings from "./settings";
 
 export default function Header() {
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const { sessions, setPomodoro, setLongBreak, setShortBreak } = useStore((state) => ({
-    sessions: state.sessions,
-    setPomodoro: state.setPomodoro,
-    setLongBreak: state.setLongBreak,
-    setShortBreak: state.setShortBreak,
-  }));
-
+  
   return (
     <div className="flex w-full justify-between px-6 pt-8 sm:justify-between sm:px-24 sm:pt-16">
-      {isMobile && (
-        <Settings
-          applySettings={(settings) => {
-            setPomodoro(settings.pomodoro);
-            setShortBreak(settings.shortBreak);
-            setLongBreak(settings.longBreak);
-          }}
-          pomodoroSession={sessions.pomodoro}
-          shortBreakSession={sessions["short-break"]}
-          longBreakSession={sessions["long-break"]}
-        />
-      )}
+      {isMobile && <Settings />}
       {!isMobile && <Logo />}
       <div className="flex gap-10">
         <VolumeToggle />

@@ -18,8 +18,7 @@ import Settings from "@/components/settings";
 // TODO: Move duration time to a source of truth place
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const { activeTabId, setActiveTabId, sessions, muted, setPomodoro, setLongBreak, setShortBreak } =
-    useStore();
+  const { activeTabId, setActiveTabId, sessions, muted } = useStore();
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
 
   const onTabChange = (newTabId: string) => {
@@ -69,23 +68,14 @@ export default function App() {
           </TabsList>
           {tabs.map((tab) => (
             <TabsContent className="w-full p-4" key={tab.id} value={tab.id}>
-              <Timer sessionTime={sessions[activeTabId]} type={activeTabId} />
+              <Timer type={activeTabId} />
             </TabsContent>
           ))}
         </Tabs>
       </div>
       {!isMobile && (
         <div className="mb-24">
-          <Settings
-            applySettings={(settings) => {
-              setPomodoro(settings.pomodoro);
-              setShortBreak(settings.shortBreak);
-              setLongBreak(settings.longBreak);
-            }}
-            longBreakSession={sessions["long-break"]}
-            shortBreakSession={sessions["short-break"]}
-            pomodoroSession={sessions.pomodoro}
-          />
+          <Settings />
         </div>
       )}
     </div>
@@ -95,10 +85,14 @@ export default function App() {
 // TODO: Add sounds to the buttons
 // TODO: Add tooltip to the buttons
 // TODO: Code cleanup
-function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
-  const [count, setCount] = useState(sessionTime);
+function Timer({ type }: { type: TabId }) {
+  const { nextTab, muted, session } = useStore((state) => ({
+    nextTab: state.nextTab,
+    muted: state.muted,
+    session: state.sessions[type],
+  }));
+  const [count, setCount] = useState(session);
   const [status, setStatus] = useState<"idle" | "running" | "stopped" | "done">("idle");
-  const { nextTab, muted } = useStore((state) => ({ nextTab: state.nextTab, muted: state.muted }));
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
     Notification.permission,
@@ -114,6 +108,13 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const isIdle = status === "idle";
 
   const tabName = tabs.find((tab) => tab.id === type)!.name;
+
+  // Syncs the count with the session time when session changes (e.g. from settings)
+  useEffect(() => {
+    worker.stop();
+    setCount(session);
+    setStatus("idle");
+  }, [session]);
 
   // TODO: Preferably this would be better inside the onTimeTick callback
   //       Reminder, the issue was the stale count value
@@ -175,7 +176,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const handleSkipClick = () => {
     worker.stop();
     setStatus("idle");
-    setCount(sessionTime);
+    setCount(session);
     !muted && playTabSound();
     nextTab();
   };
@@ -183,7 +184,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const handleResetClick = () => {
     worker.stop();
     setStatus("idle");
-    setCount(sessionTime);
+    setCount(session);
   };
 
   // FIXME: Ghost buttons keep their hover css colors after touching on mobile
