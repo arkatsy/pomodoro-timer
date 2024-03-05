@@ -15,7 +15,6 @@ import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 import Settings from "@/components/settings";
 
-// TODO: Move duration time to a source of truth place
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const { activeTabId, setActiveTabId, sessions, muted } = useStore();
@@ -36,16 +35,13 @@ export default function App() {
           className="fixed bottom-0 mt-0 flex flex-col-reverse items-center gap-24 sm:static sm:-mt-4 sm:flex-col"
         >
           <TabsList
-            className={cn(
-              "w-screen max-w-2xl select-none rounded-full transition-colors duration-300",
-              isMobile && "rounded-none p-0",
-            )}
+            className={cn("w-screen max-w-2xl select-none rounded-full", isMobile && "rounded-none p-0")}
           >
             {tabs.map((tab) => (
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
-                  className="text-md peer relative z-20 h-full w-full rounded-none transition-[colors,_opacity_300ms] duration-300  data-[state=active]:bg-primary-foreground data-[state=inactive]:transition-opacity sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
+                  className="text-md peer relative z-20 h-full w-full rounded-none data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
                 >
                   {tab.name}
                 </TabsTrigger>
@@ -54,7 +50,7 @@ export default function App() {
                     id={`timer-tab-${tab.id}`}
                     layoutId="timer-tab"
                     className={
-                      "absolute inset-0 z-10 rounded-full transition-colors duration-300 peer-data-[state=active]:bg-background peer-data-[state=active]:text-foreground peer-data-[state=active]:shadow-sm"
+                      "absolute inset-0 z-10 rounded-full peer-data-[state=active]:bg-background peer-data-[state=active]:text-foreground peer-data-[state=active]:shadow-sm"
                     }
                     transition={{
                       type: "spring",
@@ -82,9 +78,6 @@ export default function App() {
   );
 }
 
-// TODO: Add sounds to the buttons
-// TODO: Add tooltip to the buttons
-// TODO: Code cleanup
 function Timer({ type }: { type: TabId }) {
   const { nextTab, muted, session } = useStore((state) => ({
     nextTab: state.nextTab,
@@ -195,15 +188,15 @@ function Timer({ type }: { type: TabId }) {
         <Button
           variant="ghost"
           size="icon"
-          className="group size-20 transition-opacity duration-300 sm:size-16"
+          className="group size-20 transition-opacity sm:size-16"
           onClick={handleResetClick}
         >
-          <RotateCcw className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
+          <RotateCcw className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
         <Button
           variant="default"
           size="icon"
-          className="size-20 transition-colors duration-300 sm:size-16"
+          className="size-20 transition-colors sm:size-16"
           onClick={handlePlayClick}
         >
           {isRunning ? (
@@ -214,13 +207,8 @@ function Timer({ type }: { type: TabId }) {
             <Play className="ml-1 size-10 sm:size-9" />
           )}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="group size-20 transition-opacity duration-300 sm:size-16"
-          onClick={handleSkipClick}
-        >
-          <SkipForward className="size-10 opacity-70 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
+        <Button variant="ghost" size="icon" className="group size-20 sm:size-16" onClick={handleSkipClick}>
+          <SkipForward className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
       </div>
     </div>
