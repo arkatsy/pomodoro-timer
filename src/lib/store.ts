@@ -11,9 +11,7 @@ export type Store = {
 
   setActiveTabId: (newTabId: TabId) => void;
   nextTab: () => void;
-  setPomodoro: (session: number) => void;
-  setShortBreak: (session: number) => void;
-  setLongBreak: (session: number) => void;
+  setSessions: (sessions: Record<TabId, number>) => void;
   setMuted: (muted: boolean) => void;
 };
 
@@ -49,29 +47,14 @@ const useStore = create<Store>()(
           }),
         ),
 
-      setPomodoro: (session) =>
+      setSessions: (sessions) =>
         set(
           produce<Store>((state) => {
             worker.stop();
-            state.sessions.pomodoro = session;
+            state.sessions = sessions;
           }),
         ),
 
-      setShortBreak: (session) =>
-        set(
-          produce<Store>((state) => {
-            worker.stop();
-            state.sessions["short-break"] = session;
-          }),
-        ),
-
-      setLongBreak: (session) =>
-        set(
-          produce<Store>((state) => {
-            worker.stop();
-            state.sessions["long-break"] = session;
-          }),
-        ),
       setMuted: (muted) =>
         set(
           produce((state) => {

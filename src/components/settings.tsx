@@ -34,49 +34,26 @@ export default function Settings() {
 }
 
 function DialogSettingsContent({ open }: { open: boolean }) {
-  const { sessions, setPomodoro, setShortBreak, setLongBreak } = useStore((state) => ({
-    sessions: state.sessions,
-    setPomodoro: state.setPomodoro,
-    setShortBreak: state.setShortBreak,
-    setLongBreak: state.setLongBreak,
-  }));
+  const [sessions, setSessions] = useStore((state) => [state.sessions, state.setSessions]);
 
-  const [draftSettings, setDraftSettings] = useState({
-    pomodoro: sessions.pomodoro,
-    shortBreak: sessions["short-break"],
-    longBreak: sessions["long-break"],
-  });
+  const [draftSettings, setDraftSettings] = useState({ ...sessions });
 
   const pomodoroMins = Math.trunc(draftSettings.pomodoro / 60);
   const pomodoroSecs = Math.trunc(draftSettings.pomodoro % 60);
-  const shortBreakMins = Math.trunc(draftSettings.shortBreak / 60);
-  const shortBreakSecs = Math.trunc(draftSettings.shortBreak % 60);
-  const longBreakMins = Math.trunc(draftSettings.longBreak / 60);
-  const longBreakSecs = Math.trunc(draftSettings.longBreak % 60);
+  const shortBreakMins = Math.trunc(draftSettings["short-break"] / 60);
+  const shortBreakSecs = Math.trunc(draftSettings["short-break"] % 60);
+  const longBreakMins = Math.trunc(draftSettings["long-break"] / 60);
+  const longBreakSecs = Math.trunc(draftSettings["long-break"] % 60);
 
-  const [disabled, setDisabled] = useState(true);
+  const disabled = Object.entries(draftSettings).every(
+    ([key, val]) => sessions[key as keyof typeof sessions] === val,
+  );
 
   useEffect(() => {
-    setDraftSettings({
-      pomodoro: sessions.pomodoro,
-      shortBreak: sessions["short-break"],
-      longBreak: sessions["long-break"],
-    });
+    setDraftSettings({ ...sessions });
   }, [open]);
 
-  useEffect(() => {
-    setDisabled(
-      draftSettings.pomodoro === sessions.pomodoro &&
-        draftSettings.shortBreak === sessions["short-break"] &&
-        draftSettings.longBreak === sessions["long-break"],
-    );
-  }, [draftSettings.pomodoro, draftSettings.shortBreak, draftSettings.longBreak, sessions]);
-
-  const handleSettingsDone = () => {
-    setPomodoro(draftSettings.pomodoro);
-    setShortBreak(draftSettings.shortBreak);
-    setLongBreak(draftSettings.longBreak);
-  };
+  const handleSettingsDone = () => setSessions({ ...draftSettings });
 
   const handlePomodoroMinsChange = (mins: number) => {
     setDraftSettings(
@@ -97,7 +74,7 @@ function DialogSettingsContent({ open }: { open: boolean }) {
   const handleShortBreakMinsChange = (mins: number) => {
     setDraftSettings(
       produce((draft) => {
-        draft.shortBreak = mins * 60 + shortBreakSecs;
+        draft["short-break"] = mins * 60 + shortBreakSecs;
       }),
     );
   };
@@ -105,7 +82,7 @@ function DialogSettingsContent({ open }: { open: boolean }) {
   const handleShortBreakSecsChange = (secs: number) => {
     setDraftSettings(
       produce((draft) => {
-        draft.shortBreak = shortBreakMins * 60 + secs;
+        draft["short-break"] = shortBreakMins * 60 + secs;
       }),
     );
   };
@@ -113,7 +90,7 @@ function DialogSettingsContent({ open }: { open: boolean }) {
   const handleLongBreakMinsChange = (mins: number) => {
     setDraftSettings(
       produce((draft) => {
-        draft.longBreak = mins * 60 + longBreakSecs;
+        draft["long-break"] = mins * 60 + longBreakSecs;
       }),
     );
   };
@@ -121,7 +98,7 @@ function DialogSettingsContent({ open }: { open: boolean }) {
   const handleLongBreakSecsChange = (secs: number) => {
     setDraftSettings(
       produce((draft) => {
-        draft.longBreak = longBreakMins * 60 + secs;
+        draft["long-break"] = longBreakMins * 60 + secs;
       }),
     );
   };
