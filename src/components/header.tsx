@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <div className="flex justify-between px-6 pt-8 sm:px-24 sm:pt-16">
       <Logo />
-      <div className="flex gap-4">
+      <div className="flex gap-10">
         <VolumeToggle />
         <ThemeToggle />
       </div>
