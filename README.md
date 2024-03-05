@@ -1,2 +1,2 @@
 # Pomodoro Timer
-A very minimal pomodoro timer that includes short & long breaks
+A minimal pomodoro timer that includes short & long breaks
