@@ -1,7 +1,7 @@
 import notificationIcon from "@/assets/notification-icon.png";
+import notificationSound from "@/assets/notification-sound.wav";
 import tabSound from "@/assets/tab-sound.wav";
-import timerDoneSound from "@/assets/timer-done.mp3";
-import playStopSound from "@/assets/water-drop.wav";
+import startSound from "@/assets/water-drop.wav";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,11 +17,11 @@ import useSound from "use-sound";
 // TODO: Move duration time to a source of truth place
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const { activeTabId, setActiveTabId, sessions } = useStore();
+  const { activeTabId, setActiveTabId, sessions, muted } = useStore();
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
 
   const onTabChange = (newTabId: string) => {
-    playTabSound();
+    !muted && playTabSound();
     setActiveTabId(newTabId as TabId);
   };
 
@@ -82,13 +82,15 @@ export default function App() {
 function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
   const [count, setCount] = useState(sessionTime);
   const [status, setStatus] = useState<"idle" | "running" | "stopped" | "done">("idle");
-  const nextTab = useStore((state) => state.nextTab);
+  const { nextTab, muted } = useStore((state) => ({ nextTab: state.nextTab, muted: state.muted }));
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
     Notification.permission,
   );
-  const [playTimerDoneSound] = useSound(timerDoneSound, { volume: 0.5 });
-  const [playPlayStopSound] = useSound(playStopSound, { volume: 0.8 });
+  const [playNotificationSound, { stop: stopNotificationSound }] = useSound(notificationSound, {
+    volume: 0.5,
+  });
+  const [playStartSound] = useSound(startSound, { volume: 1 });
   const notificationRef = useRef<Notification | null>(null);
 
   const isRunning = status === "running";
@@ -103,7 +105,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
     if (count === 0) {
       worker.stop();
       setStatus("done");
-      playTimerDoneSound();
+      !muted && playNotificationSound();
       if (notificationPermission === "granted") {
         notificationRef.current = new Notification(`${tabName}`, {
           body: `Your ${tabName.split(" ").at(1)?.toLowerCase()} ${type === "pomodoro" ? "session" : ""} has finished`,
@@ -119,9 +121,11 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
     };
 
     // NOTE: If it gets too cumbersome, move it to a separate useEffect and / or a custom hook
-    const onVisibilityChange = () => {
+    const onVisibilityChange = (e: Event) => {
       if (!notificationRef.current) return;
       if (document.visibilityState === "visible") {
+        // TODO: The event is not always triggered as expected, try switch to focus / blur events
+        stopNotificationSound();
         notificationRef.current.close();
         notificationRef.current = null;
       }
@@ -140,7 +144,8 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
     Notification.requestPermission().then((result: NotificationPermission) => {
       setNotificationPermission(result);
     });
-    playPlayStopSound();
+
+    if (isIdle) !muted && playStartSound();
 
     if (isIdle || isStopped) {
       worker.start();
@@ -155,7 +160,7 @@ function Timer({ sessionTime, type }: { sessionTime: number; type: TabId }) {
     worker.stop();
     setStatus("idle");
     setCount(sessionTime);
-    playTabSound();
+    !muted && playTabSound();
     nextTab();
   };
 

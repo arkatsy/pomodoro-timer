@@ -7,12 +7,14 @@ import { persist } from "zustand/middleware";
 export type Store = {
   activeTabId: TabId;
   sessions: Record<TabId, number>;
+  muted: boolean;
 
   setActiveTabId: (newTabId: TabId) => void;
   nextTab: () => void;
   setPomodoro: (session: number) => void;
   setShortBreak: (session: number) => void;
   setLongBreak: (session: number) => void;
+  setMuted: (muted: boolean) => void;
 };
 
 const useStore = create<Store>()(
@@ -24,6 +26,7 @@ const useStore = create<Store>()(
         "short-break": defaultSessions["short-break"],
         "long-break": defaultSessions["long-break"],
       },
+      muted: false,
 
       setActiveTabId: (newTabId) =>
         set(
@@ -67,6 +70,12 @@ const useStore = create<Store>()(
           produce<Store>((state) => {
             worker.stop();
             state.sessions["long-break"] = session;
+          }),
+        ),
+      setMuted: (muted) =>
+        set(
+          produce((state) => {
+            state.muted = muted;
           }),
         ),
     }),
