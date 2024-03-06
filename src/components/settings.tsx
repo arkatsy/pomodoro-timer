@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import InputNumber from "@/components/ui/input-number";
 import { formatTime } from "@/lib/utils";
@@ -145,7 +144,6 @@ function DialogSettingsContent({ open }: { open: boolean }) {
           Settings
         </DialogTitle>
       </DialogHeader>
-      <Separator />
       <div className="flex flex-col py-2">
         <ul className="flex flex-col gap-12">
           {inputGroups.map(({ label, mins, secs, onMinsChange, onSecsChange, Icon }) => (
@@ -156,7 +154,6 @@ function DialogSettingsContent({ open }: { open: boolean }) {
               </Label>
               <div className="flex items-center">
                 <InputNumber id={label} min={0} max={999} onValueChange={onMinsChange} defaultValue={mins} />
-                <Separator className="-ml-2 w-4" />
                 <InputNumber min={0} max={99} onValueChange={onSecsChange} defaultValue={secs} />
               </div>
               <div className="flex gap-2 text-sm">
