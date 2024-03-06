@@ -180,23 +180,17 @@ function Timer({ type }: { type: TabId }) {
     setCount(session);
   };
 
-  // FIXME: Ghost buttons keep their hover css colors after touching on mobile
   return (
     <div className="flex flex-col gap-32 sm:gap-20">
       <div className="flex items-center justify-center text-9xl font-medium">{formatTime(count)}</div>
       <div className="flex justify-center gap-8">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="group size-20 transition-opacity sm:size-16"
-          onClick={handleResetClick}
-        >
+        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleResetClick}>
           <RotateCcw className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
         <Button
           variant="default"
           size="icon"
-          className="size-20 transition-colors sm:size-16"
+          className="size-20 rounded-xl sm:size-16"
           onClick={handlePlayClick}
         >
           {isRunning ? (
@@ -207,7 +201,7 @@ function Timer({ type }: { type: TabId }) {
             <Play className="ml-1 size-10 sm:size-9" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" className="group size-20 sm:size-16" onClick={handleSkipClick}>
+        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleSkipClick}>
           <SkipForward className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
       </div>
