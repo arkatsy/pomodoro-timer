@@ -88,7 +88,7 @@ function VolumeToggle() {
 }
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const [theme, setTheme] = useTheme();
   const muted = useStore((state) => state.muted);
   const [playSwitchOnSound] = useSound(switchOn, { volume: 0.5 });
   const [playSwitchOffSound] = useSound(switchOff, { volume: 0.5 });

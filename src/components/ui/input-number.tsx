@@ -17,6 +17,7 @@ export interface InputNumberProp extends React.InputHTMLAttributes<HTMLInputElem
 const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
   ({ className, min = 0, max = Infinity, step = 1, defaultValue, onValueChange, ...props }, ref) => {
     const [value, setValue] = React.useState(defaultValue || 0);
+    // const [palette] = usePalett
 
     const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
@@ -74,9 +75,9 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
           <Button
             name="increment"
             aria-label="increment"
-            variant="outline"
+            variant="ghost"
             type="button"
-            className="rounded-none"
+            className="rounded-none border-x border-input hover:bg-primary hover:text-primary-foreground"
             onClick={onPlusClick}
           >
             <PlusIcon className="h-4 w-4" />
@@ -84,9 +85,9 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProp>(
           <Button
             name="decrement"
             aria-label="decrement"
-            variant="outline"
+            variant="ghost"
             type="button"
-            className="rounded-l-none border-l-0"
+            className="rounded-l-none border-l-0 hover:bg-primary hover:text-primary-foreground"
             onClick={onMinusClick}
           >
             <MinusIcon className="h-4 w-4" />

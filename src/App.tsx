@@ -10,15 +10,20 @@ import useStore from "@/lib/store";
 import worker from "@/lib/time-worker";
 import { TabId, cn, formatTime, tabs } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
+import { Palette, Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 import Settings from "@/components/settings";
+import usePalette from "@/hooks/usePalette";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "./components/ui/select";
+import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const { activeTabId, setActiveTabId, sessions, muted } = useStore();
   const [playTabSound] = useSound(tabSound, { volume: 0.15 });
+  const [palette, setPalette] = usePalette();
+  const [theme] = useTheme();
 
   const onTabChange = (newTabId: string) => {
     !muted && playTabSound();
@@ -41,7 +46,10 @@ export default function App() {
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
-                  className="text-md peer relative z-20 h-full w-full rounded-none data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
+                  className={cn(
+                    "text-md peer relative z-20 h-full w-full rounded-none text-secondary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent",
+                    palette !== "initial" && "text-secondary-foreground/75",
+                  )}
                 >
                   {tab.name}
                 </TabsTrigger>
@@ -50,7 +58,7 @@ export default function App() {
                     id={`timer-tab-${tab.id}`}
                     layoutId="timer-tab"
                     className={
-                      "absolute inset-0 z-10 rounded-full peer-data-[state=active]:bg-background peer-data-[state=active]:text-foreground peer-data-[state=active]:shadow-sm"
+                      "absolute inset-0 z-10 rounded-full peer-data-[state=active]:bg-background peer-data-[state=active]:shadow-sm"
                     }
                     transition={{
                       type: "spring",
@@ -74,8 +82,51 @@ export default function App() {
           <Settings />
         </div>
       )}
+      {!isMobile && (
+        <div className="mb-16 mr-24 self-end">
+          <Select onValueChange={setPalette}>
+            <SelectTrigger className="flex size-10 items-center justify-center border-none p-1">
+              <Color palette={palette} />
+            </SelectTrigger>
+            <SelectContent className="" side="top" align="end">
+              {Object.keys(palettes).map((key) => (
+                <SelectItem value={key} key={key}>
+                  <Color palette={key as "initial" | "olive" | "vanilla" | "sand"} />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   );
+}
+
+const palettes = {
+  initial: {
+    dark: "#111112",
+    light: "#000000",
+  },
+  olive: {
+    dark: "#273518",
+    light: "#273518",
+  },
+  vanilla: {
+    dark: "#5a0c0d",
+    light: "#360708",
+  },
+  sand: {
+    dark: "#287170",
+    light: "#274754",
+  },
+};
+
+function Color({ palette = "initial" }: { palette: "initial" | "olive" | "vanilla" | "sand" }) {
+  const [theme] = useTheme();
+
+  const color = palettes[palette][theme === "dark" ? "dark" : "light"];
+
+  return <div style={{ backgroundColor: color }} className="size-5 rounded-full" />;
 }
 
 function Timer({ type }: { type: TabId }) {
@@ -184,7 +235,12 @@ function Timer({ type }: { type: TabId }) {
     <div className="flex flex-col gap-32 sm:gap-20">
       <div className="flex items-center justify-center text-9xl font-medium">{formatTime(count)}</div>
       <div className="flex justify-center gap-8">
-        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleResetClick}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 rounded-xl sm:size-16"
+          onClick={handleResetClick}
+        >
           <RotateCcw className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
         <Button
@@ -201,7 +257,12 @@ function Timer({ type }: { type: TabId }) {
             <Play className="ml-1 size-10 sm:size-9" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleSkipClick}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 rounded-xl sm:size-16"
+          onClick={handleSkipClick}
+        >
           <SkipForward className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
       </div>

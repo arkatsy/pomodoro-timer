@@ -24,7 +24,7 @@ export default function Settings() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="group p-2" aria-label="Settings" onClick={openSettingsDialog}>
-          <SettingsIcon className="size-7 text-primary group-hover:text-primary group-focus-visible:text-primary sm:size-8 sm:text-primary/80" />
+          <SettingsIcon className="size-7 text-current group-hover:text-current group-focus-visible:text-current sm:size-8 sm:text-current/80" />
         </button>
       </DialogTrigger>
       <DialogSettingsContent open={open} />
@@ -138,7 +138,7 @@ function DialogSettingsContent({ open }: { open: boolean }) {
   };
 
   return (
-    <DialogContent className="top-1/2">
+    <DialogContent className="top-1/2 border-none">
       <DialogHeader>
         <DialogTitle className="text-2xl" id="dialog-title">
           Settings
