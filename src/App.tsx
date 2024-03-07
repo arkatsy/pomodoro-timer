@@ -41,7 +41,7 @@ export default function App() {
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
-                  className="text-md peer relative z-20 h-full w-full rounded-none data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
+                  className="text-md duration-0 peer relative z-20 h-full w-full rounded-none data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
                 >
                   {tab.name}
                 </TabsTrigger>
