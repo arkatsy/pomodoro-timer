@@ -6,7 +6,7 @@ type Palette = "initial" | "olive" | "vanilla" | "sand";
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
-  defaultPalette: Palette;
+  defaultPalette?: Palette;
   storageKey?: string;
 };
 
