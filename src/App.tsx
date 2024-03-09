@@ -41,7 +41,7 @@ export default function App() {
               <div className="relative z-0 h-full w-full" key={tab.id}>
                 <TabsTrigger
                   value={tab.id}
-                  className="text-md duration-0 peer relative z-20 h-full w-full rounded-none data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
+                  className="text-md peer relative z-20 h-full w-full rounded-none duration-0 data-[state=active]:bg-primary-foreground sm:rounded-full sm:text-xl sm:data-[state=active]:bg-transparent"
                 >
                   {tab.name}
                 </TabsTrigger>
@@ -118,7 +118,7 @@ function Timer({ type }: { type: TabId }) {
       !muted && playNotificationSound();
       if (notificationPermission === "granted") {
         notificationRef.current = new Notification(`${tabName}`, {
-          body: `Your ${tabName.split(" ").at(1)?.toLowerCase()} ${type === "pomodoro" ? "session" : ""} has finished`,
+          body: `Your ${tabName.split(" ").at(0)?.toLowerCase()} ${type === "pomodoro" ? "session" : ""} has finished`,
           icon: notificationIcon,
         });
       }
@@ -184,7 +184,12 @@ function Timer({ type }: { type: TabId }) {
     <div className="flex flex-col gap-32 sm:gap-20">
       <div className="flex items-center justify-center text-9xl font-medium">{formatTime(count)}</div>
       <div className="flex justify-center gap-8">
-        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleResetClick}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 rounded-xl sm:size-16"
+          onClick={handleResetClick}
+        >
           <RotateCcw className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
         <Button
@@ -192,6 +197,7 @@ function Timer({ type }: { type: TabId }) {
           size="icon"
           className="size-20 rounded-xl sm:size-16"
           onClick={handlePlayClick}
+          disabled={count === 0}
         >
           {isRunning ? (
             <Pause className="size-10 sm:size-9" />
@@ -201,7 +207,12 @@ function Timer({ type }: { type: TabId }) {
             <Play className="ml-1 size-10 sm:size-9" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" className="group rounded-xl size-20 sm:size-16" onClick={handleSkipClick}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="group size-20 rounded-xl sm:size-16"
+          onClick={handleSkipClick}
+        >
           <SkipForward className="size-10 opacity-70 group-hover:opacity-100 group-focus-visible:opacity-100 sm:size-9" />
         </Button>
       </div>
