@@ -197,6 +197,7 @@ function Timer({ type }: { type: TabId }) {
           size="icon"
           className="size-20 rounded-xl sm:size-16"
           onClick={handlePlayClick}
+          disabled={count === 0}
         >
           {isRunning ? (
             <Pause className="size-10 sm:size-9" />
