@@ -4,16 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
     "build": "tsc && vite build",
     "analyze": "cross-env ANALYZE=\"true\" npm run build",
-    "preview": "vite preview --host",
+    "preview": "vite preview",
     "test": "vitest --run",
     "test:verbose": "vitest --run --reporter=verbose",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "docker:dev up": "docker-compose -f ./docker-compose.dev.yml up",
-    "docker:dev down": "docker-compose -f ./docker-compose.dev.yml down"
+    "docker:dev-up": "docker-compose -f ./docker-compose.dev.yml up",
+    "docker:dev-down": "docker-compose -f ./docker-compose.dev.yml down",
+    "docker:prod-up": "docker-compose -f ./docker-compose.prod.yml up",
+    "docker:prod-down": "docker-compose -f ./docker-compose.prod.yml down"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
