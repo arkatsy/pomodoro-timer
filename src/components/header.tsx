@@ -11,6 +11,18 @@ import useStore from "@/lib/store";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import Settings from "./settings";
 
+// See: https://github.com/AlfieJones/theme-toggles/issues/30
+declare module "react" {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    placeholder?: string | undefined;
+  }
+
+  interface DOMAttributes<T> {
+    onPointerEnterCapture?: React.PointerEventHandler<T> | undefined;
+    onPointerLeaveCapture?: React.PointerEventHandler<T> | undefined;
+  }
+}
+
 export default function Header() {
   const isMobile = useMediaQuery("(max-width: 640px)");
   
@@ -107,7 +119,6 @@ function ThemeToggle() {
 
   return (
     <Expand
-      placeholder={isDark ? "🌙" : "☀️"}
       className="p-1 text-3xl"
       duration={300}
       toggle={toggleTheme}

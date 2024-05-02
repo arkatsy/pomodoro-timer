@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: pomodoro-prod-c
+    image: pomodoro-prod-i
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+        - "4173:4173"
