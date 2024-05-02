@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: pomodoro-dev-c
+    image: pomodoro-dev-i
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/app/src
+    ports:
+      - "5173:5173"

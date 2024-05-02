@@ -11,7 +11,9 @@
     "test": "vitest --run",
     "test:verbose": "vitest --run --reporter=verbose",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "docker:dev up": "docker-compose -f ./docker-compose.dev.yml up",
+    "docker:dev down": "docker-compose -f ./docker-compose.dev.yml down"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
