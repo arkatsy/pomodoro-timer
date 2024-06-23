@@ -59,5 +59,3 @@ npm run docker:prod-up
 # and to stop the container
 npm run docker:prod-down
 ```
-
-For more see the `package.json` scripts.
