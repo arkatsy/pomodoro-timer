@@ -20,8 +20,6 @@ npm run dev
 
 The project is now running at [http://localhost:5173](http://localhost:5173)
 
----
-
 Or to build the prod version:
 
 ```bash
